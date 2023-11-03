@@ -1,0 +1,56 @@
+[gd_scene load_steps=3 format=3 uid="uid://c34liqc1mj7wd"]
+
+[ext_resource type="Script" path="res://Scripts/ShipUI.cs" id="1_a520v"]
+[ext_resource type="Script" path="res://Scripts/IntLineEdit.gd" id="2_ocrs0"]
+
+[node name="Control" type="Control" node_paths=PackedStringArray("_InputField")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_a520v")
+_InputField = NodePath("LineEdit")
+
+[node name="HBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+offset_right = 68.0
+offset_bottom = 101.0
+
+[node name="AttackButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Attack"
+icon_alignment = 1
+
+[node name="Move" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Move
+"
+icon_alignment = 1
+
+[node name="LookAtButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "LookAt"
+
+[node name="SplitButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Split
+"
+icon_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 2
+offset_left = 72.0
+offset_top = 106.0
+offset_right = 139.063
+offset_bottom = 137.0
+script = ExtResource("2_ocrs0")
+
+[connection signal="pressed" from="HBoxContainer/AttackButton" to="." method="_OnAttackButtonPressed"]
+[connection signal="pressed" from="HBoxContainer/Move" to="." method="OnMovePressed"]
+[connection signal="pressed" from="HBoxContainer/LookAtButton" to="." method="OnLookAtPressed"]
+[connection signal="pressed" from="HBoxContainer/SplitButton" to="." method="OnSplitPressed"]
+[connection signal="text_changed" from="LineEdit" to="LineEdit" method="_on_LineEdit_text_changed"]
+[connection signal="text_submitted" from="LineEdit" to="." method="OnLineSubmitted"]

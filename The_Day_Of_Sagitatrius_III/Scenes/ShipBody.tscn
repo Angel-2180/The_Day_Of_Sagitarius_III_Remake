@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3 uid="uid://dv4xc46hrs7m4"]
+
+[ext_resource type="Script" path="res://Scripts/Ship.cs" id="1_ixq1f"]
+[ext_resource type="PackedScene" uid="uid://bpetvjdwtcmpc" path="res://Scenes/Bullet.tscn" id="2_3i8vh"]
+[ext_resource type="Material" uid="uid://ir1v6ppwmrjj" path="res://Shaders/outline_shader.tres" id="3_7ku3q"]
+[ext_resource type="Texture2D" uid="uid://bl87auv455ad" path="res://Arts/player1.png" id="4_bavh3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oj6r8"]
+size = Vector2(129, 128)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mudpi"]
+radius = 118.106
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_cfwfu"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/sync = true
+properties/1/watch = false
+properties/2/path = NodePath("Name:text")
+properties/2/spawn = true
+properties/2/sync = true
+properties/2/watch = false
+
+[node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipLabel", "_shootDelay")]
+collision_layer = 2
+collision_mask = 4
+input_pickable = true
+script = ExtResource("1_ixq1f")
+BulletScene = ExtResource("2_3i8vh")
+CanonPosition = NodePath("bullet_shooting_pos")
+UiOffsetNode = NodePath("UiOffset")
+Detect = NodePath("Detect")
+sprite = NodePath("Sprite2D")
+_shipLabel = NodePath("Name")
+_shootDelay = NodePath("ReloadTimer")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = ExtResource("3_7ku3q")
+position = Vector2(1, 2.86102e-06)
+rotation = 1.5708
+scale = Vector2(0.250489, 0.236599)
+texture = ExtResource("4_bavh3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(1.5, -1)
+shape = SubResource("RectangleShape2D_oj6r8")
+
+[node name="bullet_shooting_pos" type="Node2D" parent="."]
+position = Vector2(100, 0)
+
+[node name="UiOffset" type="Node2D" parent="."]
+position = Vector2(-59, -76)
+
+[node name="Detect" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Detect"]
+visible = false
+shape = SubResource("CircleShape2D_mudpi")
+
+[node name="ReloadTimer" type="Timer" parent="."]
+wait_time = 0.3
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_cfwfu")
+
+[node name="Name" type="Label" parent="."]
+top_level = true
+offset_left = -64.0
+offset_top = -93.0
+offset_right = -24.0
+offset_bottom = -70.0
+text = "Name
+"

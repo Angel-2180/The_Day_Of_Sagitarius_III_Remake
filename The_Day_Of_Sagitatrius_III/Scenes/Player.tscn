@@ -1,0 +1,71 @@
+[gd_scene load_steps=5 format=3 uid="uid://d07l41m26q6qn"]
+
+[ext_resource type="Script" path="res://Scripts/Player.cs" id="1_o3bqr"]
+[ext_resource type="Script" path="res://Scripts/PlayerCamera.cs" id="2_lta75"]
+[ext_resource type="PackedScene" uid="uid://dv4xc46hrs7m4" path="res://Scenes/ShipBody.tscn" id="3_sjhgo"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_hr8ax"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+
+[node name="Player" type="Node2D" node_paths=PackedStringArray("camera", "_SplitButton", "_MergeButton", "_canvasLayer")]
+script = ExtResource("1_o3bqr")
+camera = NodePath("Camera2D")
+_SplitButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/SplitButton")
+_MergeButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/MergeButton")
+_canvasLayer = NodePath("CanvasLayer")
+
+[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("2_lta75")
+player = NodePath("../ShipBody")
+Speed = 400.0
+
+[node name="ShipBody" parent="." instance=ExtResource("3_sjhgo")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Main" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/Main"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -186.5
+offset_top = -40.0
+offset_right = 186.5
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Main/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SplitButton" type="Button" parent="CanvasLayer/Main/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Split
+"
+icon_alignment = 1
+
+[node name="MergeButton" type="Button" parent="CanvasLayer/Main/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Merge
+"
+icon_alignment = 1
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_hr8ax")
+
+[connection signal="gui_input" from="CanvasLayer/Main" to="." method="OnGuiInput"]

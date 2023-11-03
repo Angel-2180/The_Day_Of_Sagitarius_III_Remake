@@ -1,0 +1,121 @@
+[gd_scene load_steps=5 format=3 uid="uid://bk6pivbvjna56"]
+
+[ext_resource type="Script" path="res://Scripts/MultiplayerControl.cs" id="1_k3gxl"]
+[ext_resource type="PackedScene" uid="uid://d07l41m26q6qn" path="res://Scenes/Player.tscn" id="2_opnek"]
+[ext_resource type="Shader" path="res://Shaders/Stars.gdshader" id="3_sjklw"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_83ceq"]
+shader = ExtResource("3_sjklw")
+shader_parameter/bg_color = Color(0, 0, 0, 1)
+
+[node name="MainMenu" type="Control" node_paths=PackedStringArray("_pseudoInput", "_addressInput", "_clientHUD", "_serverButton", "_playerCount", "_serverAddress")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k3gxl")
+_pseudoInput = NodePath("ClientHUD/NameContainer/name_line_edit")
+_addressInput = NodePath("ClientHUD/AddressContainer/adress_input")
+_clientHUD = NodePath("ClientHUD")
+_serverButton = NodePath("ServerInfos")
+_playerCount = NodePath("ServerInfos/NumberOfPlayerLabel")
+_serverAddress = NodePath("ServerInfos/IpAddressLabel")
+_character = ExtResource("2_opnek")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_83ceq")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.439216, 0.439216, 0.439216, 1)
+
+[node name="ClientHUD" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -197.5
+offset_top = -144.0
+offset_right = 197.5
+offset_bottom = 144.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="NameContainer" type="HBoxContainer" parent="ClientHUD"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ClientHUD/NameContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name:"
+
+[node name="name_line_edit" type="LineEdit" parent="ClientHUD/NameContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="AddressContainer" type="HBoxContainer" parent="ClientHUD"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ClientHUD/AddressContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "IP Address:"
+
+[node name="adress_input" type="LineEdit" parent="ClientHUD/AddressContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="host" type="Button" parent="ClientHUD"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "HOST
+"
+
+[node name="join" type="Button" parent="ClientHUD"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "JOIN
+"
+
+[node name="ServerInfos" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -112.5
+offset_top = -65.0
+offset_right = 112.5
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NumberOfPlayerLabel" type="Label" parent="ServerInfos"]
+layout_mode = 2
+text = "Number Of player connected"
+
+[node name="startGame" type="Button" parent="ServerInfos"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "START GAME"
+
+[node name="IpAddressLabel" type="Label" parent="ServerInfos"]
+layout_mode = 2
+text = "Address
+"
+
+[connection signal="pressed" from="ClientHUD/host" to="." method="OnHostPressed"]
+[connection signal="pressed" from="ClientHUD/join" to="." method="OnJoinPressed"]
+[connection signal="pressed" from="ServerInfos/startGame" to="." method="StartGame"]
