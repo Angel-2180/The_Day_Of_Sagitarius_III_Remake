@@ -3,7 +3,7 @@ using System;
 
 public partial class Player : Node2D
 {
-
+	#region Nodes
 	[Export]
 	public Camera2D camera;
 
@@ -12,6 +12,10 @@ public partial class Player : Node2D
 
 	[Export]
 	private Button _MergeButton;
+
+	[Export]
+	private CanvasLayer _canvasLayer;
+	#endregion
 
 	public bool IsDragging = false;
 
@@ -22,8 +26,6 @@ public partial class Player : Node2D
 	[Export]
 	public int PlayerID;
 
-	[Export]
-	private CanvasLayer _canvasLayer;
 
 	[Export]
 	private int _maxMergeDistance = 500;
@@ -115,7 +117,7 @@ public partial class Player : Node2D
 				{
 					foreach (var selected in _selectedShips)
 					{
-						selected.SetTarget(ship);
+						selected.Rpc(nameof(selected.SetTarget), ship.GetPath());
 					}
 					return true;
 				}
@@ -149,8 +151,8 @@ public partial class Player : Node2D
 						{
 							foreach (var ship in _selectedShips)
 							{
-								ship.SetDestination(GetGlobalMousePosition());
-								ship.SetTarget(null);
+								ship.Rpc(nameof(ship.SetDestination), GetGlobalMousePosition());
+								if (ship.Target != null) ship.Rpc(nameof(ship.SetTarget), new NodePath());
 								ship.SetSelected(false);
 							}
 							_selectedShips.Clear();

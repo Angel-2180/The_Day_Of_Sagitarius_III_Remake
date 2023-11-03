@@ -249,23 +249,13 @@ public partial class MultiplayerControl : Control
 
     }
 
-	//TODO : upnp 
 	private void SetupUPNP()
 	{
 		_upnp = new ();
-
-		var error = _upnp.Discover();
-		Debug.Assert(error == (int)Upnp.UpnpResult.Success, "UPNP Discover Failed! Error %s" + error);
-
-		Debug.Assert(_upnp.GetGateway() != null && _upnp.GetGateway().IsValidGateway(), "UPNP Invalid Gateway!");
-
-        var mapResult = _upnp.AddPortMapping(PORT);
-
-        Debug.Assert(mapResult == (int)Upnp.UpnpResult.Success, "UPNP AddPortMapping Failed! Error %s" + mapResult);
-
-        Debug.Print("Success! Join Address : " + _upnp.GetGateway().QueryExternalAddress() + ":" + PORT);
-
-        _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + ":" + PORT;
+		_upnp.Discover();
+        _upnp.AddPortMapping(PORT);
+        Debug.Print("Success! Join Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT);
+        _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT;
 
 	}
 

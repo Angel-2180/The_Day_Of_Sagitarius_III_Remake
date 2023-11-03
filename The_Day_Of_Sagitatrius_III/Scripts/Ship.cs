@@ -5,7 +5,10 @@ using System.Diagnostics;
 public partial class Ship : CharacterBody2D
 {
     [Export]
-    public PackedScene BulletScene;
+    private PackedScene _bulletScene;
+
+    [Export]
+    private PackedScene _shipBodyScene;
 
     [Export]
     public Node2D CanonPosition;
@@ -69,16 +72,20 @@ public partial class Ship : CharacterBody2D
     [Export]
     private Timer _shootDelay;
 
+
     public override void _Ready()
     {
-        base._Ready(); 
-
         _shootDelay.Timeout += () => CanShoot = true;
 
-       sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
+        sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
 
-       ID = (GetParent() as Player).PlayerID;
+        ID = (GetParent() as Player).PlayerID;
         _shipLabel.Text = GameManager.Instance.PlayerInfos["pseudo"];
+
+        if (_shipBodyScene == null)
+        {
+            _shipBodyScene = GD.Load<PackedScene>("res://Scenes/ShipBody.tscn");
+        }
 
     }
 
@@ -99,25 +106,22 @@ public partial class Ship : CharacterBody2D
     public override void _PhysicsProcess(double delta)
     {
         _shipLabel.GlobalPosition = GlobalPosition + UiOffset;
-        if (Target != null && Target.NumberOfShips > 0)
+        if (Target != null && Target.NumberOfShips > 0) 
         {
             LookAtPosition = Target.GlobalPosition;
-            if (RotateToTarget(LookAtPosition, delta) && CanShoot)
+            if (CanShoot && RotateToTarget(LookAtPosition, delta))
             {
                 CanShoot = false;
                 _shootDelay.Start();
                 Rpc(nameof(Shoot));
             }
         }
-      
-  
-
         LookAtPosition = LookAtPosition == Vector2.Zero ? TargetPosition : LookAtPosition;
-
         if(RotateToTarget(LookAtPosition, delta))
-        {
+        {    
             Move((float)delta);
         }
+
     }
 
     public void Move(float delta)
@@ -152,6 +156,7 @@ public partial class Ship : CharacterBody2D
         }
         return result.Normalized();    
     }
+
     public bool RotateToTarget(Vector2 target, double delta)
     {
         if (target == Vector2.Zero)
@@ -161,11 +166,11 @@ public partial class Ship : CharacterBody2D
         var direction = (target - GlobalPosition).Normalized();
         var AngleTo = Transform.X.AngleTo(direction);
         Rotate(Mathf.Sign(AngleTo) * Mathf.Min((float)delta * RotationSpeed, Mathf.Abs(AngleTo)));
-        
         if (Mathf.Abs(AngleTo) < 0.01f)
         {
             LookAtPosition = Vector2.Zero;
             return true;
+
         }
         return false;
     }
@@ -173,7 +178,7 @@ public partial class Ship : CharacterBody2D
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void Shoot()
     {
-        var bullet = BulletScene.Instantiate() as Bullet;
+        var bullet = _bulletScene.Instantiate() as Bullet;
         bullet.ID = ID;
         // bullet.BulletPower = NumberOfShips;
         GetParent().AddChild(bullet);
@@ -181,12 +186,15 @@ public partial class Ship : CharacterBody2D
         bullet.Rotation = Rotation;    
     }
 
-    public void SetTarget(Ship target)
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SetTarget(NodePath target)
     {
-        Target = target;
+        Ship targetShip = GetTree().Root.GetNodeOrNull<Ship>(target);
+        Target = targetShip;
         if (Target != null)
         {
             LookAtPosition = Target.GlobalPosition;
+            TargetPosition = Vector2.Zero;
         }
     }
 
@@ -206,8 +214,11 @@ public partial class Ship : CharacterBody2D
         }
 
         NumberOfShips -= numberOfShipsToRemove;
-        var newPlayer = (Ship)GD.Load<PackedScene>("res://Scenes/ShipBody.tscn").Instantiate();
+        var newPlayer =  _shipBodyScene.Instantiate() as Ship;
+        newPlayer.ID = ID;
+        newPlayer._shipLabel.Text = "manger " + 1;
         newPlayer.NumberOfShips = numberOfShipsToRemove;
+
         newPlayer.Position = Position + Transform.X.Normalized() * 100;
         GetParent().AddChild(newPlayer);
 
@@ -224,9 +235,11 @@ public partial class Ship : CharacterBody2D
         }
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void SetDestination(Vector2 destination)
     {
         TargetPosition = destination;
     }
+
 
 }
