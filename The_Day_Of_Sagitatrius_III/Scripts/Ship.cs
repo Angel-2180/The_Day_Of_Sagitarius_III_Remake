@@ -72,6 +72,7 @@ public partial class Ship : CharacterBody2D
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(ID);
+        Name = (ID + GetParent().GetChildCount()).ToString();
     }
 
     public override void _Ready()
