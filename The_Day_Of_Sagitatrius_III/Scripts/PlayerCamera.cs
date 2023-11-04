@@ -43,8 +43,7 @@ public partial class PlayerCamera : Camera2D
 		}
 		if (Input.IsActionJustPressed("zoom_out"))
 		{
-			if (Zoom.X >0.5f && Zoom.Y > 0.5f )
-				Zoom -= new Vector2(0.1f, 0.1f);
+			Zoom -= new Vector2(0.1f, 0.1f);
 		}
 		
 

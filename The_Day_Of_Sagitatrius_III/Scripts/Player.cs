@@ -266,6 +266,7 @@ public partial class Player : Node2D
 			if (ship.ID == PlayerID && ship != firstShip && ship.GlobalPosition.DistanceTo(firstShip.GlobalPosition) < _maxMergeDistance)
 			{
 				totalShips += ship.NumberOfShips;
+				_selectedShips.Remove(ship);
 				ship.QueueFree();
 			}
 		}
