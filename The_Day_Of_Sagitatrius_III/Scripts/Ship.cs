@@ -205,7 +205,7 @@ public partial class Ship : CharacterBody2D
         }
 
         NumberOfShips -= numberOfShipsToRemove;
-        var newPlayer = (Ship)Duplicate();
+        var newPlayer = GD.Load<PackedScene>("res://Scenes/ShipBody.tscn").Instantiate() as Ship;
         newPlayer.ID = ID;
         newPlayer._shipLabel.Text = "manger " + 1;
         newPlayer.NumberOfShips = numberOfShipsToRemove;

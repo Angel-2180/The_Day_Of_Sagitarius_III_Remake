@@ -1,11 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://ck5ly0chxduow"]
+[gd_scene load_steps=2 format=3 uid="uid://ck5ly0chxduow"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_clptx"]
-[ext_resource type="PackedScene" uid="uid://d07l41m26q6qn" path="res://Scenes/Player.tscn" id="2_jyu07"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_clptx")
-PlayerScene = ExtResource("2_jyu07")
 
 [node name="SpawnPos" type="Node2D" parent="."]
 
