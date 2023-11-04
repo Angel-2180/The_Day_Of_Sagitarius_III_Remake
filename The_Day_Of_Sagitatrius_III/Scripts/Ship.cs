@@ -109,7 +109,7 @@ public partial class Ship : CharacterBody2D
     public override void _PhysicsProcess(double delta)
     {
         _shipLabel.GlobalPosition = GlobalPosition + UiOffset;
-        if (Target != null && Target.NumberOfShips > 0) 
+        if (IsInstanceValid(Target) && Target.NumberOfShips > 0) 
         {
             LookAtPosition = Target.GlobalPosition;
             if (CanShoot && RotateToTarget(LookAtPosition, delta))
