@@ -8,9 +8,6 @@ public partial class Ship : CharacterBody2D
     private PackedScene _bulletScene;
 
     [Export]
-    private PackedScene _shipBodyScene;
-
-    [Export]
     public Node2D CanonPosition;
 
     [Export]
@@ -81,12 +78,6 @@ public partial class Ship : CharacterBody2D
 
         ID = (GetParent() as Player).PlayerID;
         _shipLabel.Text = GameManager.Instance.PlayerInfos["pseudo"];
-
-        if (_shipBodyScene == null)
-        {
-            _shipBodyScene = GD.Load<PackedScene>("res://Scenes/ShipBody.tscn");
-        }
-
     }
 
     public void SetSelected(bool selected)
@@ -214,7 +205,7 @@ public partial class Ship : CharacterBody2D
         }
 
         NumberOfShips -= numberOfShipsToRemove;
-        var newPlayer =  _shipBodyScene.Instantiate() as Ship;
+        var newPlayer = (Ship)Duplicate();
         newPlayer.ID = ID;
         newPlayer._shipLabel.Text = "manger " + 1;
         newPlayer.NumberOfShips = numberOfShipsToRemove;
