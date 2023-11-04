@@ -69,9 +69,20 @@ public partial class Ship : CharacterBody2D
     [Export]
     private Timer _shootDelay;
 
+    public override void _EnterTree()
+    {
+        SetMultiplayerAuthority(ID);
+    }
 
     public override void _Ready()
     {
+        if(!GetParent().IsMultiplayerAuthority())
+        {
+            SetProcess(false);
+            SetPhysicsProcess(false);
+            SetProcessInput(false);
+        }
+
         _shootDelay.Timeout += () => CanShoot = true;
 
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;

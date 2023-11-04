@@ -41,9 +41,17 @@ public partial class Player : Node2D
 
 	private PlayerState _state = PlayerState.Idle;
 
+	[Export]
+	private PackedScene firstShip;
+
 	public override void _EnterTree()
     {
         SetMultiplayerAuthority(PlayerID);
+
+		var newShip = firstShip.Instantiate() as Ship;
+		newShip.ID = PlayerID;
+
+		AddChild(newShip);
     }
 
 

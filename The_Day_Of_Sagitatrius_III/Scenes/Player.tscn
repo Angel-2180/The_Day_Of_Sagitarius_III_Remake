@@ -10,13 +10,12 @@ camera = NodePath("Camera2D")
 _SplitButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/SplitButton")
 _MergeButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/MergeButton")
 _canvasLayer = NodePath("CanvasLayer")
+firstShip = ExtResource("3_sjhgo")
 
 [node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("2_lta75")
-player = NodePath("../ShipBody")
+player = NodePath("")
 Speed = 400.0
-
-[node name="ShipBody" parent="." instance=ExtResource("3_sjhgo")]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
