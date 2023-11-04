@@ -234,8 +234,14 @@ public partial class Ship : CharacterBody2D
         NumberOfShips -= (int)damagePower;
         if (NumberOfShips <= 0)
         {
-            QueueFree();
+            Rpc(nameof(Kill));
         }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void Kill()
+    {
+        QueueFree();
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
