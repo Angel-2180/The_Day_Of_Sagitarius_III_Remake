@@ -31,7 +31,6 @@ collision_mask = 4
 input_pickable = true
 script = ExtResource("1_ixq1f")
 _bulletScene = ExtResource("2_3i8vh")
-_shipBodyScene = null
 CanonPosition = NodePath("bullet_shooting_pos")
 UiOffsetNode = NodePath("UiOffset")
 Detect = NodePath("Detect")
