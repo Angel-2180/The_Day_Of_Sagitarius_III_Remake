@@ -12,9 +12,8 @@ _MergeButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/MergeButt
 _canvasLayer = NodePath("CanvasLayer")
 firstShip = ExtResource("3_sjhgo")
 
-[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("player")]
+[node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("2_lta75")
-player = NodePath("")
 Speed = 400.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]

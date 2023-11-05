@@ -184,7 +184,7 @@ public partial class MultiplayerControl : Control
     private void OnPlayerDisconnected(long id)
     {
         GameManager.Instance.PlayerIDs.Remove((int)id);
-        _world.GetNode(id.ToString()).QueueFree();
+        _world.GetNodeOrNull<Player>(id.ToString())?.QueueFree();
 
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
