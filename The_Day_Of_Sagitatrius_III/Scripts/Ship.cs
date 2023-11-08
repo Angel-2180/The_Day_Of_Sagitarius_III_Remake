@@ -191,7 +191,6 @@ public partial class Ship : CharacterBody2D
     {
         var bullet = _bulletScene.Instantiate() as Bullet;
         bullet.ID = ID;
-        // bullet.BulletPower = NumberOfShips;
         GetParent().AddChild(bullet);
         bullet.GlobalPosition = CanonPosition.GlobalPosition;
         bullet.Rotation = Rotation;    

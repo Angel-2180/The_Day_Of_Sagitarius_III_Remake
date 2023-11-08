@@ -8,7 +8,7 @@
 shader = ExtResource("3_sjklw")
 shader_parameter/bg_color = Color(0, 0, 0, 1)
 
-[node name="MainMenu" type="Control" node_paths=PackedStringArray("_pseudoInput", "_addressInput", "_clientHUD", "_serverButton", "_playerCount", "_serverAddress")]
+[node name="MainMenu" type="Control" node_paths=PackedStringArray("_pseudoInput", "_addressInput", "_clientHUD", "_serverButton", "_ClientsInfos", "_ConnectionsInfos", "_playerCount", "_serverAddress")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,8 +20,10 @@ _pseudoInput = NodePath("ClientHUD/NameContainer/name_line_edit")
 _addressInput = NodePath("ClientHUD/AddressContainer/adress_input")
 _clientHUD = NodePath("ClientHUD")
 _serverButton = NodePath("ServerInfos")
-_playerCount = NodePath("ServerInfos/NumberOfPlayerLabel")
-_serverAddress = NodePath("ServerInfos/IpAddressLabel")
+_ClientsInfos = NodePath("ClientInfos")
+_ConnectionsInfos = NodePath("ConnectionsInfos")
+_playerCount = NodePath("ConnectionsInfos/NumberOfPlayerLabel")
+_serverAddress = NodePath("ConnectionsInfos/IpAddressLabel")
 _character = ExtResource("2_opnek")
 
 [node name="ColorRect" type="ColorRect" parent="."]
@@ -35,6 +37,7 @@ grow_vertical = 2
 color = Color(0.439216, 0.439216, 0.439216, 1)
 
 [node name="ClientHUD" type="VBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -102,20 +105,61 @@ offset_bottom = 65.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="NumberOfPlayerLabel" type="Label" parent="ServerInfos"]
-layout_mode = 2
-text = "Number Of player connected"
-
 [node name="startGame" type="Button" parent="ServerInfos"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "START GAME"
 
-[node name="IpAddressLabel" type="Label" parent="ServerInfos"]
+[node name="ClientInfos" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -112.5
+offset_top = -45.5
+offset_right = 112.5
+offset_bottom = 10.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ReturnButton" type="Button" parent="ClientInfos"]
 layout_mode = 2
+text = "Return To lobby"
+
+[node name="ConnectionsInfos" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -3.0
+offset_top = -30.0
+offset_right = -3.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="NumberOfPlayerLabel" type="Label" parent="ConnectionsInfos"]
+layout_mode = 2
+offset_left = 533.0
+offset_top = 266.0
+offset_right = 758.0
+offset_bottom = 292.0
+text = "Number Of player connected"
+
+[node name="IpAddressLabel" type="Label" parent="ConnectionsInfos"]
+layout_mode = 2
+offset_left = 532.0
+offset_top = 294.0
+offset_right = 757.0
+offset_bottom = 320.0
 text = "Address
 "
 
 [connection signal="pressed" from="ClientHUD/host" to="." method="OnHostPressed"]
 [connection signal="pressed" from="ClientHUD/join" to="." method="OnJoinPressed"]
 [connection signal="pressed" from="ServerInfos/startGame" to="." method="StartGame"]
+[connection signal="pressed" from="ClientInfos/ReturnButton" to="." method="ReturnToMenu"]

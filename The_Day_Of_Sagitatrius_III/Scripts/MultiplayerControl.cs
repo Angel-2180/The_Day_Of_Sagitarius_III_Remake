@@ -46,6 +46,12 @@ public partial class MultiplayerControl : Control
     [Export]
     private Control _serverButton;
 
+    [Export]
+    private Control _ClientsInfos;
+
+    [Export]
+    private Control _ConnectionsInfos;
+
 
     // [Export]
     // private OptionButton _teamOptions;
@@ -73,6 +79,11 @@ public partial class MultiplayerControl : Control
         // _teamOptions.ItemSelected += _ => GameManager.Instance.PlayerInfos["team"] = (_teamOptions.Selected - 1).ToString();
 
         instance = this;
+
+        _serverButton.Visible = false;
+        _ClientsInfos.Visible = false;
+        _ConnectionsInfos.Visible = false;
+        _clientHUD.Visible = true;
         
         Multiplayer.PeerConnected += OnPlayerConnected;
         Multiplayer.PeerDisconnected += OnPlayerDisconnected;
@@ -97,8 +108,6 @@ public partial class MultiplayerControl : Control
 
     private void StartGame()
     {
-        _serverButton.Visible = false;
-
 		Rpc("LoadGame", "res://Scenes/Main.tscn");
 
         if (Multiplayer.IsServer())
@@ -136,6 +145,7 @@ public partial class MultiplayerControl : Control
 
         _clientHUD.Visible = false;
         _serverButton.Visible = true;
+        _ConnectionsInfos.Visible = true;
         _playerCount.Text = GameManager.Instance.PlayerIDs.Count + " / " + MAX_CONNECTIONS + " players";
 
         SetupUPNP();
@@ -147,16 +157,14 @@ public partial class MultiplayerControl : Control
     {
         if (address  == "")
             address  = DEFAULT_SERVER_IP;
-        
         Error error = _peer.CreateClient(address , PORT);
-
         if (error != Error.Ok)
             return error;
         
         Multiplayer.MultiplayerPeer = _peer;
-
         _clientHUD.Visible = false;
-
+        _ClientsInfos.Visible = true;
+        _ConnectionsInfos.Visible = true;
         return null;
     }
 
@@ -172,6 +180,8 @@ public partial class MultiplayerControl : Control
 
         GameManager.Instance.PlayerIDs[newPlayerID] = newPlayerInfo;
         _playerCount.Text = GameManager.Instance.PlayerIDs.Count + " / " + MAX_CONNECTIONS + " players";
+        //get connected server address
+
 
         EmitSignal(SignalName.PlayerConnected, newPlayerID, newPlayerInfo);
     }
@@ -185,7 +195,7 @@ public partial class MultiplayerControl : Control
     {
         GameManager.Instance.PlayerIDs.Remove((int)id);
         _world.GetNodeOrNull<Player>(id.ToString())?.QueueFree();
-
+        
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
 
@@ -245,7 +255,12 @@ public partial class MultiplayerControl : Control
     private void OnServerDisconnected()
     {
         Multiplayer.MultiplayerPeer = null;
+        EmitSignal(SignalName.ServerDisconnected);
 
+        _clientHUD.Visible = true;
+        _serverButton.Visible = false;
+        GetTree().Root.GetNodeOrNull("Main")?.QueueFree();
+        GetTree().ReloadCurrentScene();
 
     }
 
@@ -258,6 +273,11 @@ public partial class MultiplayerControl : Control
         _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT;
 
 	}
+
+    private void ReturnToMenu()
+    {
+        GetTree().ReloadCurrentScene();
+    }
 
 
 
