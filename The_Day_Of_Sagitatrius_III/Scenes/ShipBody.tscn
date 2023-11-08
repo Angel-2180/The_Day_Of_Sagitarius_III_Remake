@@ -16,20 +16,20 @@ properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/sync = true
 properties/0/watch = false
-properties/1/path = NodePath("Name:text")
+properties/1/path = NodePath(".:rotation")
 properties/1/spawn = true
 properties/1/sync = true
 properties/1/watch = false
-properties/2/path = NodePath(".:rotation")
+properties/2/path = NodePath("NumberOfShips:text")
 properties/2/spawn = true
 properties/2/sync = true
 properties/2/watch = false
-properties/3/path = NodePath("Name:position")
+properties/3/path = NodePath("NumberOfShips:position")
 properties/3/spawn = true
 properties/3/sync = true
 properties/3/watch = false
 
-[node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipLabel", "_shootDelay")]
+[node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipNumberLabel", "_shootDelay")]
 collision_layer = 2
 collision_mask = 4
 input_pickable = true
@@ -39,7 +39,7 @@ CanonPosition = NodePath("bullet_shooting_pos")
 UiOffsetNode = NodePath("UiOffset")
 Detect = NodePath("Detect")
 sprite = NodePath("Sprite2D")
-_shipLabel = NodePath("Name")
+_shipNumberLabel = NodePath("NumberOfShips")
 _shootDelay = NodePath("ReloadTimer")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -74,11 +74,11 @@ wait_time = 0.3
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_cfwfu")
 
-[node name="Name" type="Label" parent="."]
+[node name="NumberOfShips" type="Label" parent="."]
 top_level = true
 offset_left = -64.0
 offset_top = -93.0
 offset_right = -24.0
 offset_bottom = -70.0
-text = "Name
+text = "idk 900
 "

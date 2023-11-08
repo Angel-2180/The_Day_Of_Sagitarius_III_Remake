@@ -20,7 +20,7 @@ public partial class Ship : CharacterBody2D
     public Sprite2D sprite;
 
     [Export]
-    private Label _shipLabel;
+    private Label _shipNumberLabel;
 
     public Vector2 mousePos = Vector2.Zero;
     
@@ -41,7 +41,7 @@ public partial class Ship : CharacterBody2D
     public float RotationSpeed = 2f;
 
     [Export]
-    public int NumberOfShips = 10000;   
+    public int FleetSize = 10000;   
 
     public Vector2 UiOffset => UiOffsetNode.Position;
 
@@ -89,7 +89,8 @@ public partial class Ship : CharacterBody2D
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
 
         ID = (GetParent() as Player).PlayerID;
-        _shipLabel.Text = GameManager.Instance.PlayerInfos["pseudo"];
+        _shipNumberLabel.Text = FleetSize.ToString();
+        
     }
 
     public void SetSelected(bool selected)
@@ -105,11 +106,18 @@ public partial class Ship : CharacterBody2D
         }
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SetFleetSize(int newFleetSize)
+    {
+        FleetSize = newFleetSize;
+        _shipNumberLabel.Text = FleetSize.ToString();
+    }
+
 
     public override void _PhysicsProcess(double delta)
     {
-        _shipLabel.GlobalPosition = GlobalPosition + UiOffset;
-        if (IsInstanceValid(Target) && Target.NumberOfShips > 0) 
+        _shipNumberLabel.GlobalPosition = GlobalPosition + UiOffset;
+        if (IsInstanceValid(Target) && Target.FleetSize > 0) 
         {
             LookAtPosition = Target.GlobalPosition;
             if (CanShoot && RotateToTarget(LookAtPosition, delta))
@@ -204,7 +212,7 @@ public partial class Ship : CharacterBody2D
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void Split(int numberOfShipsToRemove)
     {
-        if (numberOfShipsToRemove > NumberOfShips)
+        if (numberOfShipsToRemove > FleetSize)
         {
             GD.Print("Not enough ships to split");
             return;
@@ -216,23 +224,21 @@ public partial class Ship : CharacterBody2D
             return;
         }
 
-        NumberOfShips -= numberOfShipsToRemove;
+        SetFleetSize(FleetSize - numberOfShipsToRemove);
+
         var newPlayer = GD.Load<PackedScene>("res://Scenes/ShipBody.tscn").Instantiate() as Ship;
         newPlayer.ID = ID;
-        newPlayer._shipLabel.Text = _shipLabel.Text;
-        newPlayer.NumberOfShips = numberOfShipsToRemove;
+        newPlayer.SetFleetSize(numberOfShipsToRemove);
 
         newPlayer.Position = Position + Transform.X.Normalized() * 100;
         GetParent().AddChild(newPlayer);
-
-
     }
 
 
     public void TakeDamage(float damagePower)
     {
-        NumberOfShips -= (int)damagePower;
-        if (NumberOfShips <= 0)
+        FleetSize -= (int)damagePower;
+        if (FleetSize <= 0)
         {
             Rpc(nameof(Kill));
         }
