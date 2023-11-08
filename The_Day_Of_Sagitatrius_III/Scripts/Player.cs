@@ -30,6 +30,12 @@ public partial class Player : Node2D
 	[Export]
 	private int _maxMergeDistance = 500;
 
+	[Export]
+	private int _maxNumberOfShips = 20;
+
+	private int _numberOfShips = 1;
+
+
 	private Color _color = Colors.Yellow;
 
 	enum PlayerState
@@ -90,9 +96,10 @@ public partial class Player : Node2D
 				if (ship.ID == PlayerID)
 				{
 					ship.SetSelected(true);
-					if (_state == PlayerState.AwaitSplitting)
+					if (_state == PlayerState.AwaitSplitting && _numberOfShips < _maxNumberOfShips)
 					{
-						ship.Rpc(nameof(ship.Split), ship.NumberOfShips / 2);
+						ship.Rpc(nameof(ship.Split), ship.FleetSize / 2);
+						_numberOfShips++;
 						_state = PlayerState.Idle;
 						_color = Colors.Yellow;
 					}
@@ -218,12 +225,14 @@ public partial class Player : Node2D
 		}
 		_state = PlayerState.AwaitSplitting;
 		_color = Colors.Red;
-		if (_selectedShips.Count > 0)
+		if (_selectedShips.Count > 0 && _numberOfShips < _maxNumberOfShips)
 		{
 			foreach (var ship in _selectedShips)
 			{
+				if (_numberOfShips >= _maxNumberOfShips) break;
 				ship.SetSelected(false);
-				ship.Rpc(nameof(ship.Split), ship.NumberOfShips / 2);
+				ship.Rpc(nameof(ship.Split), ship.FleetSize / 2);
+				_numberOfShips++;
 			}
 			_state = PlayerState.Idle;
 			_selectedShips.Clear();
@@ -252,6 +261,7 @@ public partial class Player : Node2D
 			_selectedShips.Clear();
 			_state = PlayerState.Idle;
 			_color = Colors.Yellow;
+			_numberOfShips--;
 		}
 	
 	}
@@ -265,11 +275,13 @@ public partial class Player : Node2D
 		{	
 			if (ship.ID == PlayerID && ship != firstShip && ship.GlobalPosition.DistanceTo(firstShip.GlobalPosition) < _maxMergeDistance)
 			{
-				totalShips += ship.NumberOfShips;
+				totalShips += ship.FleetSize;
 				_selectedShips.Remove(ship);
 				ship.QueueFree();
 			}
 		}
+		firstShip.Rpc(nameof(firstShip.SetFleetSize), firstShip.FleetSize + totalShips);
+		_numberOfShips--;
 	}
 
     public override void _PhysicsProcess(double delta)
