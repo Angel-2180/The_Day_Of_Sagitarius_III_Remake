@@ -16,9 +16,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_k3gxl")
-_pseudoInput = NodePath("ClientHUD/NameContainer/name_line_edit")
-_addressInput = NodePath("ClientHUD/AddressContainer/adress_input")
-_clientHUD = NodePath("ClientHUD")
+_pseudoInput = NodePath("MainHUD/NameContainer/name_line_edit")
+_addressInput = NodePath("MainHUD/AddressContainer/adress_input")
+_clientHUD = NodePath("MainHUD")
 _serverButton = NodePath("ServerInfos")
 _ClientsInfos = NodePath("ClientInfos")
 _ConnectionsInfos = NodePath("ConnectionsInfos")
@@ -36,7 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.439216, 0.439216, 0.439216, 1)
 
-[node name="ClientHUD" type="VBoxContainer" parent="."]
+[node name="MainHUD" type="VBoxContainer" parent="."]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -52,39 +52,39 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="NameContainer" type="HBoxContainer" parent="ClientHUD"]
+[node name="NameContainer" type="HBoxContainer" parent="MainHUD"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="ClientHUD/NameContainer"]
+[node name="Label" type="Label" parent="MainHUD/NameContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Name:"
 
-[node name="name_line_edit" type="LineEdit" parent="ClientHUD/NameContainer"]
+[node name="name_line_edit" type="LineEdit" parent="MainHUD/NameContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 
-[node name="AddressContainer" type="HBoxContainer" parent="ClientHUD"]
+[node name="AddressContainer" type="HBoxContainer" parent="MainHUD"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="ClientHUD/AddressContainer"]
+[node name="Label" type="Label" parent="MainHUD/AddressContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "IP Address:"
 
-[node name="adress_input" type="LineEdit" parent="ClientHUD/AddressContainer"]
+[node name="adress_input" type="LineEdit" parent="MainHUD/AddressContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 
-[node name="host" type="Button" parent="ClientHUD"]
+[node name="host" type="Button" parent="MainHUD"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "HOST
 "
 
-[node name="join" type="Button" parent="ClientHUD"]
+[node name="join" type="Button" parent="MainHUD"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "JOIN
@@ -98,9 +98,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -112.5
-offset_top = -65.0
-offset_right = 112.5
+offset_left = -112.0
+offset_top = -41.0
+offset_right = 113.0
 offset_bottom = 65.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -130,14 +130,11 @@ layout_mode = 2
 text = "Return To lobby"
 
 [node name="ConnectionsInfos" type="Control" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -3.0
-offset_top = -30.0
-offset_right = -3.0
-offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -159,7 +156,7 @@ offset_bottom = 320.0
 text = "Address
 "
 
-[connection signal="pressed" from="ClientHUD/host" to="." method="OnHostPressed"]
-[connection signal="pressed" from="ClientHUD/join" to="." method="OnJoinPressed"]
+[connection signal="pressed" from="MainHUD/host" to="." method="OnHostPressed"]
+[connection signal="pressed" from="MainHUD/join" to="." method="OnJoinPressed"]
 [connection signal="pressed" from="ServerInfos/startGame" to="." method="StartGame"]
 [connection signal="pressed" from="ClientInfos/ReturnButton" to="." method="ReturnToMenu"]

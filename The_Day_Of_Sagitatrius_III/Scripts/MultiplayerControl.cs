@@ -14,7 +14,7 @@ public partial class MultiplayerControl : Control
     public delegate void PlayerConnectedEventHandler(int peer_id, Dictionary<string, string> player_info);
 
     [Signal]
-    public delegate void PlayerDisconnectedEventHandler(int peer_id);
+    public delegate void PlayerDisconnectedEventHandler(long peer_id);
 
     [Signal]
     public delegate void ServerDisconnectedEventHandler();
@@ -90,6 +90,8 @@ public partial class MultiplayerControl : Control
         Multiplayer.ConnectedToServer += OnConnectedOK;
         Multiplayer.ConnectionFailed += OnConnectionFailed;
         Multiplayer.ServerDisconnected += OnServerDisconnected;
+
+        PlayerDisconnected += OnPlayerDisconnected;
     }
 
     private void OnHostPressed()
@@ -103,7 +105,12 @@ public partial class MultiplayerControl : Control
     {
         // if (_teamOptions.Selected != 0)
         if (_pseudoInput.Text != "")
-		    JoinServer(_addressInput.Text);
+        {
+            JoinServer(_addressInput.Text);
+
+        }
+
+		   
     }
 
     private void StartGame()
@@ -159,7 +166,10 @@ public partial class MultiplayerControl : Control
             address  = DEFAULT_SERVER_IP;
         Error error = _peer.CreateClient(address , PORT);
         if (error != Error.Ok)
+        {
+            GetTree().ReloadCurrentScene();
             return error;
+        }
         
         Multiplayer.MultiplayerPeer = _peer;
         _clientHUD.Visible = false;
@@ -180,8 +190,15 @@ public partial class MultiplayerControl : Control
 
         GameManager.Instance.PlayerIDs[newPlayerID] = newPlayerInfo;
         _playerCount.Text = GameManager.Instance.PlayerIDs.Count + " / " + MAX_CONNECTIONS + " players";
-        //get connected server address
-
+        if (Multiplayer.IsServer())
+        {
+            _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT;
+        }
+        else
+        {
+            var address = _addressInput.Text == "" ? DEFAULT_SERVER_IP : _addressInput.Text;
+            _serverAddress.Text = "Server Address : " + address + " : " + PORT;
+        }
 
         EmitSignal(SignalName.PlayerConnected, newPlayerID, newPlayerInfo);
     }
@@ -191,13 +208,22 @@ public partial class MultiplayerControl : Control
         Multiplayer.MultiplayerPeer = null;
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void UpdatePlayerCount()
+    {
+        _playerCount.Text = GameManager.Instance.PlayerIDs.Count + " / " + MAX_CONNECTIONS + " players";
+    }
+
     private void OnPlayerDisconnected(long id)
     {
         GameManager.Instance.PlayerIDs.Remove((int)id);
-        _world.GetNodeOrNull<Player>(id.ToString())?.QueueFree();
-        
-        EmitSignal(SignalName.PlayerDisconnected, id);
+        var player = _world.GetNodeOrNull<Player>(id.ToString());
+        player?.QueueFree();
+        Rpc(nameof(UpdatePlayerCount));
+        Multiplayer.MultiplayerPeer = null;
     }
+
+
 
     private void OnConnectedOK()
     {
@@ -209,6 +235,7 @@ public partial class MultiplayerControl : Control
     private void OnConnectionFailed()
     {
         Multiplayer.MultiplayerPeer = null;
+        GetTree().ReloadCurrentScene();
     }
 
     public void PlayerLoaded()
@@ -234,7 +261,7 @@ public partial class MultiplayerControl : Control
     {
         Player player = _character.Instantiate() as Player;
 
-        player.Name = PlayerInfos["pseudo"];
+        player.Name = id.ToString();
 		player.PlayerID = (int)id;
 	
 
@@ -276,7 +303,8 @@ public partial class MultiplayerControl : Control
 
     private void ReturnToMenu()
     {
-        GetTree().ReloadCurrentScene();
+        EmitSignal(SignalName.PlayerDisconnected, Multiplayer.GetUniqueId());
+
     }
 
 
