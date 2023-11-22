@@ -6,10 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://bl87auv455ad" path="res://Arts/player1.png" id="4_bavh3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oj6r8"]
-size = Vector2(129, 128)
+size = Vector2(54, 50)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_mudpi"]
-radius = 118.106
+radius = 38.0789
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_cfwfu"]
 properties/0/path = NodePath(".:position")
@@ -46,26 +46,24 @@ _shootDelay = NodePath("ReloadTimer")
 material = ExtResource("3_7ku3q")
 position = Vector2(1, 2.86102e-06)
 rotation = 1.5708
-scale = Vector2(0.250489, 0.236599)
+scale = Vector2(0.1, 0.1)
 texture = ExtResource("4_bavh3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2(1.5, -1)
+position = Vector2(1, 0)
 shape = SubResource("RectangleShape2D_oj6r8")
 
 [node name="bullet_shooting_pos" type="Node2D" parent="."]
-position = Vector2(100, 0)
+position = Vector2(38, 0)
 
 [node name="UiOffset" type="Node2D" parent="."]
-position = Vector2(-59, -76)
+position = Vector2(-26, -28)
 
 [node name="Detect" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Detect"]
-visible = false
 shape = SubResource("CircleShape2D_mudpi")
 
 [node name="ReloadTimer" type="Timer" parent="."]

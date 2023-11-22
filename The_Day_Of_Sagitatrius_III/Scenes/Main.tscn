@@ -1,14 +1,60 @@
-[gd_scene load_steps=2 format=3 uid="uid://ck5ly0chxduow"]
+[gd_scene load_steps=3 format=3 uid="uid://ck5ly0chxduow"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_clptx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tpjbr"]
+size = Vector2(50, 50)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_clptx")
 
 [node name="SpawnPos" type="Node2D" parent="."]
+scale = Vector2(3, 3)
 
-[node name="0" type="Node2D" parent="SpawnPos" groups=["PlayerSpawnPoint"]]
-position = Vector2(-327, 153)
+[node name="Team1Spawn" type="Area2D" parent="SpawnPos" groups=["Spawn_rec"]]
+position = Vector2(26, 214.667)
+metadata/_edit_group_ = true
 
-[node name="1" type="Node2D" parent="SpawnPos" groups=["PlayerSpawnPoint"]]
-position = Vector2(297, -97)
+[node name="SpawnCollision" type="CollisionShape2D" parent="SpawnPos/Team1Spawn"]
+visible = false
+shape = SubResource("RectangleShape2D_tpjbr")
+
+[node name="ColorRect" type="ColorRect" parent="SpawnPos/Team1Spawn"]
+show_behind_parent = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.341176, 0.482353, 1, 0.290196)
+metadata/_edit_use_anchors_ = true
+
+[node name="Team2Spawn" type="Area2D" parent="SpawnPos" groups=["Spawn_rec"]]
+position = Vector2(401, 26)
+metadata/_edit_group_ = true
+
+[node name="SpawnCollision" type="CollisionShape2D" parent="SpawnPos/Team2Spawn"]
+visible = false
+shape = SubResource("RectangleShape2D_tpjbr")
+
+[node name="ColorRect" type="ColorRect" parent="SpawnPos/Team2Spawn"]
+show_behind_parent = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 0, 0.290196)
+metadata/_edit_use_anchors_ = true

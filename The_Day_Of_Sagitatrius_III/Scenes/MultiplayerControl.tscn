@@ -8,7 +8,7 @@
 shader = ExtResource("3_sjklw")
 shader_parameter/bg_color = Color(0, 0, 0, 1)
 
-[node name="MainMenu" type="Control" node_paths=PackedStringArray("_pseudoInput", "_addressInput", "_clientHUD", "_serverButton", "_ClientsInfos", "_ConnectionsInfos", "_playerCount", "_serverAddress")]
+[node name="MainMenu" type="Control" node_paths=PackedStringArray("_pseudoInput", "_addressInput", "_clientHUD", "_serverButton", "_ClientsInfos", "_ConnectionsInfos", "_teamOptions", "_playerCount", "_serverAddress")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,6 +22,7 @@ _clientHUD = NodePath("MainHUD")
 _serverButton = NodePath("ServerInfos")
 _ClientsInfos = NodePath("ClientInfos")
 _ConnectionsInfos = NodePath("ConnectionsInfos")
+_teamOptions = NodePath("MainHUD/OptionButton")
 _playerCount = NodePath("ConnectionsInfos/NumberOfPlayerLabel")
 _serverAddress = NodePath("ConnectionsInfos/IpAddressLabel")
 _character = ExtResource("2_opnek")
@@ -37,7 +38,6 @@ grow_vertical = 2
 color = Color(0.439216, 0.439216, 0.439216, 1)
 
 [node name="MainHUD" type="VBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -89,6 +89,15 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "JOIN
 "
+
+[node name="OptionButton" type="OptionButton" parent="MainHUD"]
+layout_mode = 2
+item_count = 2
+allow_reselect = true
+popup/item_0/text = "Blue"
+popup/item_0/id = 0
+popup/item_1/text = "Red"
+popup/item_1/id = 1
 
 [node name="ServerInfos" type="VBoxContainer" parent="."]
 visible = false

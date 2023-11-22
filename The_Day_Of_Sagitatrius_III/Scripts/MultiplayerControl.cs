@@ -52,9 +52,8 @@ public partial class MultiplayerControl : Control
     [Export]
     private Control _ConnectionsInfos;
 
-
-    // [Export]
-    // private OptionButton _teamOptions;
+    [Export]
+    private OptionButton _teamOptions;
 
     [Export]
     private Label _playerCount;
@@ -68,6 +67,7 @@ public partial class MultiplayerControl : Control
     private PackedScene _character;
 
 	private Node2D _world;
+    private Vector2 _spawnArea;
 
     public override void _Ready()
     {
@@ -76,7 +76,7 @@ public partial class MultiplayerControl : Control
 
         _pseudoInput.TextChanged += _ => GameManager.Instance.PlayerInfos["pseudo"] =_pseudoInput.Text;
 
-        // _teamOptions.ItemSelected += _ => GameManager.Instance.PlayerInfos["team"] = (_teamOptions.Selected - 1).ToString();
+        _teamOptions.ItemSelected += _ => GameManager.Instance.PlayerInfos["team"] = _teamOptions.Selected.ToString();
 
         instance = this;
 
@@ -96,15 +96,15 @@ public partial class MultiplayerControl : Control
 
     private void OnHostPressed()
     {
-        // if (_teamOptions.Selected != 0)
-        if (_pseudoInput.Text != "")
+        if (_teamOptions.Selected != -1 && _pseudoInput.Text != "")
+        {
 		    CreateServer();
+        }
     }
 
     private void OnJoinPressed()
     {
-        // if (_teamOptions.Selected != 0)
-        if (_pseudoInput.Text != "")
+        if (_teamOptions.Selected != -1 && _pseudoInput.Text != "")
         {
             JoinServer(_addressInput.Text);
 
@@ -217,7 +217,7 @@ public partial class MultiplayerControl : Control
     private void OnPlayerDisconnected(long id)
     {
         GameManager.Instance.PlayerIDs.Remove((int)id);
-        var player = _world.GetNodeOrNull<Player>(id.ToString());
+        var player = GetTree().Root.GetNodeOrNull<Player>(id.ToString());
         player?.QueueFree();
         Rpc(nameof(UpdatePlayerCount));
         Multiplayer.MultiplayerPeer = null;
@@ -254,29 +254,51 @@ public partial class MultiplayerControl : Control
         _loadedPlayer = 0;
     }
 
-	int _spawnIndex = 0;
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void AddPlayer(long id, Dictionary<string, string> PlayerInfos)
     {
         Player player = _character.Instantiate() as Player;
-
         player.Name = id.ToString();
 		player.PlayerID = (int)id;
-	
-
 		_world.AddChild(player);
-		foreach (var Spawn in GetTree().GetNodesInGroup("PlayerSpawnPoint"))
-		{
-			var spawnPoint = (Node2D)Spawn;
-			if (spawnPoint.Name == _spawnIndex.ToString())
-			{
-				GD.Print("SpawnPoint: " + spawnPoint.Name);
-				GD.Print("Spawned player at: " + spawnPoint.GlobalPosition);
-				player.Position = spawnPoint.GlobalPosition;
-			}
-		}
-		_spawnIndex++;
+
+        var spawnNode = _world.FindChild("SpawnCollision") as CollisionShape2D;
+        if (spawnNode != null)
+        {
+            _spawnArea = spawnNode.Shape.GetRect().Size;
+        }
+
+        switch (PlayerInfos["team"])
+        {
+            case "0":
+                var node = _world.FindChild("Team1Spawn") as Area2D;
+                if (node != null)
+                {
+                    Vector2 origin = node.GlobalPosition;
+                    var spawnPoint = GetRandomSpawnPoint(origin, origin +  _spawnArea);
+                    player.GlobalPosition = spawnPoint;
+                }
+                break;
+            case "1":
+                var node2 = _world.FindChild("Team2Spawn") as Area2D;
+                if (node2 != null)
+                {
+                    Vector2 origin = node2.GlobalPosition;
+                    var spawnPoint = GetRandomSpawnPoint(origin, origin +  _spawnArea);
+                    player.GlobalPosition = spawnPoint;
+                }
+                break;
+        }
+    }
+
+    private Vector2 GetRandomSpawnPoint(Vector2 origin, Vector2 spawnArea)
+    {
+        var random = new Godot.RandomNumberGenerator();
+        random.Randomize();
+        var x = random.RandfRange(origin.X, spawnArea.X);
+        var y = random.RandfRange(origin.Y, spawnArea.Y);
+        return new Vector2(x, y);
     }
 
     private void OnServerDisconnected()
