@@ -326,7 +326,7 @@ public partial class MultiplayerControl : Control
     private void ReturnToMenu()
     {
         EmitSignal(SignalName.PlayerDisconnected, Multiplayer.GetUniqueId());
-
+        GetTree().ReloadCurrentScene();
     }
 
 
