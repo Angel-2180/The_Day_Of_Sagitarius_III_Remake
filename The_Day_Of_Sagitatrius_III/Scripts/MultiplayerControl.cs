@@ -69,6 +69,7 @@ public partial class MultiplayerControl : Control
 	private Node2D _world;
     private Vector2 _spawnArea;
 
+
     public override void _Ready()
     {
         GameManager.Instance.PlayerInfos["team"] = "0";
@@ -217,9 +218,13 @@ public partial class MultiplayerControl : Control
     private void OnPlayerDisconnected(long id)
     {
         GameManager.Instance.PlayerIDs.Remove((int)id);
-        var player = GetTree().Root.GetNodeOrNull<Player>(id.ToString());
+        var player = _world.GetNodeOrNull<Player>(id.ToString());
         player?.QueueFree();
         Rpc(nameof(UpdatePlayerCount));
+        if (Multiplayer.IsServer())
+        {
+            Rpc(nameof(ReturnToMenu));
+        }
         Multiplayer.MultiplayerPeer = null;
     }
 
@@ -261,7 +266,6 @@ public partial class MultiplayerControl : Control
         Player player = _character.Instantiate() as Player;
         player.Name = id.ToString();
 		player.PlayerID = (int)id;
-		_world.AddChild(player);
 
         var spawnNode = _world.FindChild("SpawnCollision") as CollisionShape2D;
         if (spawnNode != null)
@@ -278,6 +282,7 @@ public partial class MultiplayerControl : Control
                     Vector2 origin = node.GlobalPosition;
                     var spawnPoint = GetRandomSpawnPoint(origin, origin +  _spawnArea);
                     player.GlobalPosition = spawnPoint;
+                    player.team = GameManager.Team.Blue;
                 }
                 break;
             case "1":
@@ -287,9 +292,11 @@ public partial class MultiplayerControl : Control
                     Vector2 origin = node2.GlobalPosition;
                     var spawnPoint = GetRandomSpawnPoint(origin, origin +  _spawnArea);
                     player.GlobalPosition = spawnPoint;
+                    player.team = GameManager.Team.Red;
                 }
                 break;
         }
+		_world.AddChild(player);
     }
 
     private Vector2 GetRandomSpawnPoint(Vector2 origin, Vector2 spawnArea)
@@ -323,6 +330,7 @@ public partial class MultiplayerControl : Control
 
 	}
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void ReturnToMenu()
     {
         EmitSignal(SignalName.PlayerDisconnected, Multiplayer.GetUniqueId());

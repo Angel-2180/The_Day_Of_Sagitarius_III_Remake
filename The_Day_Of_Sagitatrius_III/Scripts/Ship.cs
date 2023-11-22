@@ -69,6 +69,8 @@ public partial class Ship : CharacterBody2D
     [Export]
     private Timer _shootDelay;
 
+    public GameManager.Team team = GameManager.Team.Neutral;
+
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(ID);
@@ -88,7 +90,6 @@ public partial class Ship : CharacterBody2D
 
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
 
-        ID = (GetParent() as Player).PlayerID;
         _shipNumberLabel.Text = FleetSize.ToString();
         
     }
@@ -227,6 +228,7 @@ public partial class Ship : CharacterBody2D
 
         var newPlayer = GD.Load<PackedScene>("res://Scenes/ShipBody.tscn").Instantiate() as Ship;
         newPlayer.ID = ID;
+        newPlayer.team = team;
         newPlayer.SetFleetSize(numberOfShipsToRemove);
 
         newPlayer.Position = Position + Transform.X.Normalized() * 100;
@@ -234,9 +236,11 @@ public partial class Ship : CharacterBody2D
     }
 
 
+    
     public void TakeDamage(float damagePower)
     {
         FleetSize -= (int)damagePower;
+        _shipNumberLabel.Text = FleetSize.ToString();
         if (FleetSize <= 0)
         {
             Rpc(nameof(Kill));

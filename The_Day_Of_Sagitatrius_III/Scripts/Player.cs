@@ -38,6 +38,8 @@ public partial class Player : Node2D
 
 	private Color _color = Colors.Yellow;
 
+	public GameManager.Team team = GameManager.Team.Neutral;
+
 	enum PlayerState
 	{
 		Idle,
@@ -56,6 +58,7 @@ public partial class Player : Node2D
 
 		var newShip = firstShip.Instantiate() as Ship;
 		newShip.ID = PlayerID;
+		newShip.team = team;
 
 		AddChild(newShip);
     }
@@ -128,7 +131,7 @@ public partial class Player : Node2D
 			var item = result[0]["collider"].As<Node>();
 			if (item is Ship ship)
 			{
-				if (ship.ID != PlayerID)
+				if (ship.ID != PlayerID && team != ship.team )
 				{
 					foreach (var selected in _selectedShips)
 					{

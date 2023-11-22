@@ -11,6 +11,12 @@ public partial class GameManager : Node
     public Godot.Collections.Dictionary<int, Godot.Collections.Dictionary<string, string>> PlayerIDs = new ();
 
 	static public GameManager Instance { get; private set; }
+    public enum Team
+	{
+		Red,
+		Blue,
+		Neutral
+    }
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
