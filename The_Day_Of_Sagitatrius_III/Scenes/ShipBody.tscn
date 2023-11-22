@@ -50,6 +50,7 @@ scale = Vector2(0.1, 0.1)
 texture = ExtResource("4_bavh3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(1, 0)
 shape = SubResource("RectangleShape2D_oj6r8")
 
@@ -57,9 +58,10 @@ shape = SubResource("RectangleShape2D_oj6r8")
 position = Vector2(38, 0)
 
 [node name="UiOffset" type="Node2D" parent="."]
-position = Vector2(-26, -28)
+position = Vector2(-40, -50)
 
 [node name="Detect" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 collision_mask = 2
 
@@ -74,9 +76,9 @@ replication_config = SubResource("SceneReplicationConfig_cfwfu")
 
 [node name="NumberOfShips" type="Label" parent="."]
 top_level = true
-offset_left = -64.0
-offset_top = -93.0
-offset_right = -24.0
-offset_bottom = -70.0
+offset_left = -40.0
+offset_top = -50.0
+offset_right = 16.0
+offset_bottom = -24.0
 text = "idk 900
 "
