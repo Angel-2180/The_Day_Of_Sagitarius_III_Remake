@@ -1,10 +1,6 @@
 using Godot;
 using Godot.Collections;
-using System;
 using System.Diagnostics;
-using System.Runtime.ConstrainedExecution;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 
 public partial class MultiplayerControl : Control
 {
@@ -19,21 +15,18 @@ public partial class MultiplayerControl : Control
     [Signal]
     public delegate void ServerDisconnectedEventHandler();
 
-
     private const int MAX_CONNECTIONS = 8;
     private const int PORT = 7000;
     private const string DEFAULT_SERVER_IP = "127.0.0.1";
-
 
     private ENetMultiplayerPeer _peer = new();
 
     private Upnp _upnp = new();
 
-
-
     private int _loadedPlayer = 0;
 
     #region Nodes
+
     [Export]
     private LineEdit _pseudoInput;
 
@@ -61,21 +54,20 @@ public partial class MultiplayerControl : Control
     [Export]
     private Label _serverAddress;
 
-    #endregion
+    #endregion Nodes
 
     [Export]
     private PackedScene _character;
 
-	private Node2D _world;
+    private Node2D _world;
     private Vector2 _spawnArea;
-
 
     public override void _Ready()
     {
         GameManager.Instance.PlayerInfos["team"] = "0";
         GameManager.Instance.PlayerInfos["pseudo"] = "Monkey";
 
-        _pseudoInput.TextChanged += _ => GameManager.Instance.PlayerInfos["pseudo"] =_pseudoInput.Text;
+        _pseudoInput.TextChanged += _ => GameManager.Instance.PlayerInfos["pseudo"] = _pseudoInput.Text;
 
         _teamOptions.ItemSelected += _ => GameManager.Instance.PlayerInfos["team"] = _teamOptions.Selected.ToString();
 
@@ -85,7 +77,7 @@ public partial class MultiplayerControl : Control
         _ClientsInfos.Visible = false;
         _ConnectionsInfos.Visible = false;
         _clientHUD.Visible = true;
-        
+
         Multiplayer.PeerConnected += OnPlayerConnected;
         Multiplayer.PeerDisconnected += OnPlayerDisconnected;
         Multiplayer.ConnectedToServer += OnConnectedOK;
@@ -100,7 +92,7 @@ public partial class MultiplayerControl : Control
     {
         if (_teamOptions.Selected != -1 && _pseudoInput.Text != "")
         {
-		    CreateServer();
+            CreateServer();
         }
     }
 
@@ -109,33 +101,32 @@ public partial class MultiplayerControl : Control
         if (_teamOptions.Selected != -1 && _pseudoInput.Text != "")
         {
             JoinServer(_addressInput.Text);
-
-        }  
+        }
     }
 
     private void StartGame()
     {
-		Rpc("LoadGame", "res://Scenes/Main.tscn");
+        Rpc("LoadGame", "res://Scenes/Main.tscn");
 
         if (Multiplayer.IsServer())
         {
             _serverButton.Visible = false;
-            
-            foreach(var(key, value) in GameManager.Instance.PlayerIDs)
+
+            foreach (var (key, value) in GameManager.Instance.PlayerIDs)
             {
-				Rpc("AddPlayer", key, value);
+                Rpc("AddPlayer", key, value);
             }
         }
     }
 
-	[Rpc(CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void LoadGame(string scenePath)
-	{
-		Node2D scene = ResourceLoader.Load<PackedScene>(scenePath).Instantiate() as Node2D;
-		_world = scene;
-		GetTree().Root.AddChild(scene);
-		Hide();
-	}
+    [Rpc(CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void LoadGame(string scenePath)
+    {
+        Node2D scene = ResourceLoader.Load<PackedScene>(scenePath).Instantiate() as Node2D;
+        _world = scene;
+        GetTree().Root.AddChild(scene);
+        Hide();
+    }
 
     private Error? CreateServer()
     {
@@ -159,17 +150,17 @@ public partial class MultiplayerControl : Control
         return null;
     }
 
-    private Error? JoinServer(string address )
+    private Error? JoinServer(string address)
     {
-        if (address  == "")
-            address  = DEFAULT_SERVER_IP;
-        Error error = _peer.CreateClient(address , PORT);
+        if (address == "")
+            address = DEFAULT_SERVER_IP;
+        Error error = _peer.CreateClient(address, PORT);
         if (error != Error.Ok)
         {
             GetTree().ReloadCurrentScene();
             return error;
         }
-        
+
         Multiplayer.MultiplayerPeer = _peer;
         _clientHUD.Visible = false;
         _ClientsInfos.Visible = true;
@@ -222,8 +213,6 @@ public partial class MultiplayerControl : Control
         Multiplayer.MultiplayerPeer = null;
     }
 
-
-
     private void OnConnectedOK()
     {
         int peerId = Multiplayer.GetUniqueId();
@@ -246,20 +235,18 @@ public partial class MultiplayerControl : Control
 
         if (_loadedPlayer < GameManager.Instance.PlayerIDs.Count)
             return;
-        
 
         GD.Print("Start Game");
 
         _loadedPlayer = 0;
     }
 
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void AddPlayer(long id, Dictionary<string, string> PlayerInfos)
     {
         Player player = _character.Instantiate() as Player;
         player.Name = id.ToString();
-		player.PlayerID = (int)id;
+        player.PlayerID = (int)id;
 
         var spawnNode = _world.FindChild("SpawnCollision") as CollisionShape2D;
         if (spawnNode != null)
@@ -274,23 +261,24 @@ public partial class MultiplayerControl : Control
                 if (node != null)
                 {
                     Vector2 origin = node.GlobalPosition;
-                    var spawnPoint = GetRandomSpawnPoint(origin, origin +  _spawnArea);
+                    var spawnPoint = GetRandomSpawnPoint(origin, origin + _spawnArea);
                     player.GlobalPosition = spawnPoint;
                     player.team = GameManager.Team.Blue;
                 }
                 break;
+
             case "1":
                 var node2 = _world.FindChild("Team2Spawn") as Area2D;
                 if (node2 != null)
                 {
                     Vector2 origin = node2.GlobalPosition;
-                    var spawnPoint = GetRandomSpawnPoint(origin, origin +  _spawnArea);
+                    var spawnPoint = GetRandomSpawnPoint(origin, origin + _spawnArea);
                     player.GlobalPosition = spawnPoint;
                     player.team = GameManager.Team.Red;
                 }
                 break;
         }
-		_world.AddChild(player);
+        _world.AddChild(player);
     }
 
     private Vector2 GetRandomSpawnPoint(Vector2 origin, Vector2 spawnArea)
@@ -311,15 +299,14 @@ public partial class MultiplayerControl : Control
         GetTree().ReloadCurrentScene();
     }
 
-	private void SetupUPNP()
-	{
-		_upnp = new ();
-		_upnp.Discover();
+    private void SetupUPNP()
+    {
+        _upnp = new();
+        _upnp.Discover();
         _upnp.AddPortMapping(PORT);
         Debug.Print("Success! Join Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT);
         _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT;
-
-	}
+    }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void ReturnToMenu()

@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using System.Diagnostics;
 
 public partial class Ship : CharacterBody2D
 {
@@ -23,25 +21,23 @@ public partial class Ship : CharacterBody2D
     private Label _shipNumberLabel;
 
     public Vector2 mousePos = Vector2.Zero;
-    
-    #region Variables
 
+    #region Variables
 
     public Vector2 TargetPosition = Vector2.Zero;
 
     public Vector2 LookAtPosition = Vector2.Zero;
 
-    public bool IsSelected ;
+    public bool IsSelected;
 
     [Export]
     public float Speed = 200.0f;
-    
-    
+
     [Export]
     public float RotationSpeed = 2f;
 
     [Export]
-    public int FleetSize = 10000;   
+    public int FleetSize = 10000;
 
     public Vector2 UiOffset => UiOffsetNode.Position;
 
@@ -51,13 +47,11 @@ public partial class Ship : CharacterBody2D
 
     public float AvoidanceWeight = 0.2f;
 
-    #endregion
-
+    #endregion Variables
 
     public bool IsMoveSelected = false;
 
     public bool IsLookAtSelected = false;
-
 
     [Export]
     public int ID = 0;
@@ -79,7 +73,7 @@ public partial class Ship : CharacterBody2D
 
     public override void _Ready()
     {
-        if(!GetParent().IsMultiplayerAuthority())
+        if (!GetParent().IsMultiplayerAuthority())
         {
             SetProcess(false);
             SetPhysicsProcess(false);
@@ -91,7 +85,6 @@ public partial class Ship : CharacterBody2D
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
 
         _shipNumberLabel.Text = FleetSize.ToString();
-        
     }
 
     public void SetSelected(bool selected)
@@ -114,11 +107,10 @@ public partial class Ship : CharacterBody2D
         _shipNumberLabel.Text = FleetSize.ToString();
     }
 
-
     public override void _PhysicsProcess(double delta)
     {
         _shipNumberLabel.GlobalPosition = GlobalPosition + UiOffset;
-        if (IsInstanceValid(Target) && Target.FleetSize > 0) 
+        if (IsInstanceValid(Target) && Target.FleetSize > 0)
         {
             LookAtPosition = Target.GlobalPosition;
             if (CanShoot && RotateToTarget(LookAtPosition, delta))
@@ -129,18 +121,17 @@ public partial class Ship : CharacterBody2D
             }
         }
         LookAtPosition = LookAtPosition == Vector2.Zero ? TargetPosition : LookAtPosition;
-        if(RotateToTarget(LookAtPosition, delta))
-        {    
+        if (RotateToTarget(LookAtPosition, delta))
+        {
             Move((float)delta);
         }
-
     }
 
     public void Move(float delta)
-    { 
+    {
         Velocity = Vector2.Zero;
         if (TargetPosition != Vector2.Zero)
-        {    
+        {
             Velocity = GlobalPosition.DirectionTo(TargetPosition);
             if (GlobalPosition.DistanceTo(TargetPosition) < AvoidanceRadius)
             {
@@ -148,7 +139,7 @@ public partial class Ship : CharacterBody2D
             }
         }
         AvoidanceForce = Avoid();
-        Velocity = (Velocity + AvoidanceForce * AvoidanceWeight).Normalized() * Speed;     
+        Velocity = (Velocity + AvoidanceForce * AvoidanceWeight).Normalized() * Speed;
         MoveAndCollide(Velocity * delta);
     }
 
@@ -159,14 +150,13 @@ public partial class Ship : CharacterBody2D
 
         if (neighbors.Count > 0)
         {
-            
             foreach (var neighbor in neighbors)
             {
                 result += neighbor.GlobalPosition.DirectionTo(GlobalPosition);
             }
             result /= neighbors.Count;
         }
-        return result.Normalized();    
+        return result.Normalized();
     }
 
     public bool RotateToTarget(Vector2 target, double delta)
@@ -182,7 +172,6 @@ public partial class Ship : CharacterBody2D
         {
             LookAtPosition = Vector2.Zero;
             return true;
-
         }
         return false;
     }
@@ -194,7 +183,7 @@ public partial class Ship : CharacterBody2D
         bullet.ID = ID;
         GetParent().AddChild(bullet);
         bullet.GlobalPosition = CanonPosition.GlobalPosition;
-        bullet.Rotation = Rotation;    
+        bullet.Rotation = Rotation;
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -235,8 +224,6 @@ public partial class Ship : CharacterBody2D
         GetParent().AddChild(newPlayer);
     }
 
-
-    
     public void TakeDamage(float damagePower)
     {
         FleetSize -= (int)damagePower;
@@ -258,6 +245,4 @@ public partial class Ship : CharacterBody2D
     {
         TargetPosition = destination;
     }
-
-
 }
