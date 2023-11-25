@@ -93,6 +93,7 @@ public partial class MultiplayerControl : Control
         Multiplayer.ServerDisconnected += OnServerDisconnected;
 
         PlayerDisconnected += OnPlayerDisconnected;
+        ServerDisconnected += OnServerDisconnected;
     }
 
     private void OnHostPressed()
@@ -109,9 +110,7 @@ public partial class MultiplayerControl : Control
         {
             JoinServer(_addressInput.Text);
 
-        }
-
-		   
+        }  
     }
 
     private void StartGame()
@@ -127,7 +126,6 @@ public partial class MultiplayerControl : Control
 				Rpc("AddPlayer", key, value);
             }
         }
-       
     }
 
 	[Rpc(CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -221,10 +219,6 @@ public partial class MultiplayerControl : Control
         var player = _world.GetNodeOrNull<Player>(id.ToString());
         player?.QueueFree();
         Rpc(nameof(UpdatePlayerCount));
-        if (Multiplayer.IsServer())
-        {
-            Rpc(nameof(ReturnToMenu));
-        }
         Multiplayer.MultiplayerPeer = null;
     }
 
@@ -311,13 +305,10 @@ public partial class MultiplayerControl : Control
     private void OnServerDisconnected()
     {
         Multiplayer.MultiplayerPeer = null;
-        EmitSignal(SignalName.ServerDisconnected);
 
         _clientHUD.Visible = true;
         _serverButton.Visible = false;
-        GetTree().Root.GetNodeOrNull("Main")?.QueueFree();
         GetTree().ReloadCurrentScene();
-
     }
 
 	private void SetupUPNP()
@@ -337,6 +328,11 @@ public partial class MultiplayerControl : Control
         GetTree().ReloadCurrentScene();
     }
 
-
-
+    public override void _ExitTree()
+    {
+        if (Multiplayer.IsServer())
+        {
+            Rpc(nameof(ReturnToMenu));
+        }
+    }
 }
