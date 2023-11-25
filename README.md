@@ -2,14 +2,15 @@
 
 ## Description
 
-The Day Of Sagittarius III Remake is a 2D multiplayer space strategy game inspired by the fictional game depicted in "The Melancholy of Haruhi Suzumiya" novel. Engage in intense 4 vs 4 battles, navigating through unknown maps shrouded in darkness (fog of war), with the objective of eliminating the opposing team. Command your fleet, split it into squadrons, and strategically outmaneuver your rivals in this real-time strategy (RTS) experience.
+The Day Of Sagittarius III Remake is a 2D multiplayer space strategy game inspired by the fictional game depicted in "The Melancholy of Haruhi Suzumiya" novel. 
+Engage in intense 4 vs 4 battles, navigating through unknown maps shrouded in darkness (fog of war), with the objective of eliminating the opposing team. 
+Command your fleet, split it into squadrons, and strategically outmaneuver your rivals in this real-time strategy (RTS) experience.
 
 ## Table of Contents
 
 - [The Day Of Sagittarius III Remake](#the-day-of-sagittarius-iii-remake)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
-  - [Usage](#usage)
   - [Features](#features)
   - [Current Work in Progress](#current-work-in-progress)
   - [License](#license)
@@ -27,17 +28,17 @@ cd the-day-of-sagittarius-iii-remake
 # Additional installation steps, if any
 ``` -->
 
-## Usage
+<!-- ## Usage
 
 Explain how to use your game. Include any commands or steps users need to follow to get the game up and running. Provide examples.
 
 ```bash
 # Example usage
 godot --path /path/to/the-day-of-sagittarius-iii-remake
-```
+``` -->
 
 ## Features
-Multiplayer 4v4 battles 🌌
+Multiplayer 4v4 battles 🌌 
 Fog of war for strategic navigation 🌫️
 Fleet command with up to 20 squadrons 🚢
 Real-time strategy in a captivating space setting 🎮
