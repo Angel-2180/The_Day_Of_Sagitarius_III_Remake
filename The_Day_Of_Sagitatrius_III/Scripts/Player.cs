@@ -99,14 +99,14 @@ public partial class Player : Node2D
                     ship.SetSelected(true);
                     if (_state == PlayerState.AwaitSplitting && _numberOfShips < _maxNumberOfShips)
                     {
-                        ship.Rpc(nameof(ship.Split), ship.FleetSize / 2);
+                        ship.Rpc(Ship.MethodName.Split, ship.FleetSize / 2);
                         _numberOfShips++;
                         _state = PlayerState.Idle;
                         _color = Colors.Yellow;
                     }
                     else if (_state == PlayerState.AwaitMerge && Selected.Count > 1)
                     {
-                        Rpc(nameof(Merge));
+                        Merge();
                         _state = PlayerState.Idle;
                         _color = Colors.Yellow;
                     }
@@ -132,7 +132,7 @@ public partial class Player : Node2D
                 {
                     foreach (var selected in _selectedShips)
                     {
-                        selected.Rpc(nameof(selected.SetTarget), ship.GetPath());
+                        selected.Rpc(Ship.MethodName.SetTarget, ship.GetPath());
                     }
                     return true;
                 }
@@ -166,8 +166,8 @@ public partial class Player : Node2D
                         {
                             foreach (var ship in _selectedShips)
                             {
-                                ship.Rpc(nameof(ship.SetDestination), GetGlobalMousePosition());
-                                if (ship.Target != null) ship.Rpc(nameof(ship.SetTarget), new NodePath());
+                                ship.Rpc(Ship.MethodName.SetDestination, GetGlobalMousePosition());
+                                if (ship.Target != null) ship.Rpc(Ship.MethodName.SetTarget, new NodePath());
                                 ship.SetSelected(false);
                             }
                             _selectedShips.Clear();
@@ -229,7 +229,7 @@ public partial class Player : Node2D
             {
                 if (_numberOfShips >= _maxNumberOfShips) break;
                 ship.SetSelected(false);
-                ship.Rpc(nameof(ship.Split), ship.FleetSize / 2);
+                ship.Rpc(Ship.MethodName.Split, ship.FleetSize / 2);
                 _numberOfShips++;
             }
             _state = PlayerState.Idle;
@@ -251,34 +251,31 @@ public partial class Player : Node2D
 
         if (_selectedShips.Count > 0)
         {
-            foreach (var ship in _selectedShips)
-            {
-                ship.SetSelected(false);
-                Rpc(nameof(Merge));
-            }
+            Merge();
             _selectedShips.Clear();
             _state = PlayerState.Idle;
             _color = Colors.Yellow;
-            _numberOfShips--;
         }
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+   
     public void Merge()
     {
         int totalShips = 0;
         Ship firstShip = _selectedShips[0];
-        foreach (var ship in _selectedShips)
+        for (int index = _selectedShips.Count - 1; index >= 0; index--)
         {
-            if (ship.ID == PlayerID && ship != firstShip && ship.GlobalPosition.DistanceTo(firstShip.GlobalPosition) < _maxMergeDistance)
+            Ship ship = _selectedShips[index];
+            if (firstShip != ship && firstShip.GlobalPosition.DistanceTo(ship.GlobalPosition) < _maxMergeDistance)
             {
                 totalShips += ship.FleetSize;
-                _selectedShips.Remove(ship);
-                ship.QueueFree();
+                _selectedShips.RemoveAt(index);
+                ship.Rpc(Ship.MethodName.Kill);
+                _numberOfShips--;
             }
         }
-        firstShip.Rpc(nameof(firstShip.SetFleetSize), firstShip.FleetSize + totalShips);
-        _numberOfShips--;
+        firstShip.Rpc(Ship.MethodName.SetFleetSize, firstShip.FleetSize + totalShips);
+        firstShip.SetSelected(false);
     }
 
     public override void _PhysicsProcess(double delta)

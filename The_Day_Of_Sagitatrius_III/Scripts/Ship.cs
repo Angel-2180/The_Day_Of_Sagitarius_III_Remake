@@ -117,7 +117,7 @@ public partial class Ship : CharacterBody2D
             {
                 CanShoot = false;
                 _shootDelay.Start();
-                Rpc(nameof(Shoot));
+                Rpc(MethodName.Shoot);
             }
         }
         LookAtPosition = LookAtPosition == Vector2.Zero ? TargetPosition : LookAtPosition;
@@ -220,7 +220,8 @@ public partial class Ship : CharacterBody2D
         newPlayer.team = team;
         newPlayer.SetFleetSize(numberOfShipsToRemove);
 
-        newPlayer.Position = Position + Transform.X.Normalized() * 100;
+        //random position around the ship
+        newPlayer.Position = Position + new Vector2(GD.Randf() * 100 - 50, GD.Randf() * 100 - 50);
         GetParent().AddChild(newPlayer);
     }
 
@@ -230,7 +231,7 @@ public partial class Ship : CharacterBody2D
         _shipNumberLabel.Text = FleetSize.ToString();
         if (FleetSize <= 0)
         {
-            Rpc(nameof(Kill));
+            Rpc(MethodName.Kill);
         }
     }
 
