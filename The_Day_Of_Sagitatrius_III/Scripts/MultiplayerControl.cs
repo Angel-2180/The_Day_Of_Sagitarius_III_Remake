@@ -15,6 +15,9 @@ public partial class MultiplayerControl : Control
     [Signal]
     public delegate void ServerDisconnectedEventHandler();
 
+    [Signal]
+    public delegate void UpnpCompletedEventHandler(Error error);
+
     private const int MAX_CONNECTIONS = 8;
     private const int PORT = 7000;
     private const string DEFAULT_SERVER_IP = "127.0.0.1";
@@ -22,6 +25,8 @@ public partial class MultiplayerControl : Control
     private ENetMultiplayerPeer _peer = new();
 
     private Upnp _upnp = new();
+
+    private GodotThread _upnpThread = null;
 
     private int _loadedPlayer = 0;
 
@@ -86,6 +91,8 @@ public partial class MultiplayerControl : Control
 
         PlayerDisconnected += OnPlayerDisconnected;
         ServerDisconnected += OnServerDisconnected;
+
+        _upnpThread = new ();
     }
 
     private void OnHostPressed()
@@ -145,7 +152,7 @@ public partial class MultiplayerControl : Control
         _ConnectionsInfos.Visible = true;
         _playerCount.Text = GameManager.Instance.PlayerIDs.Count + " / " + MAX_CONNECTIONS + " players";
 
-        SetupUPNP();
+        _upnpThread.Start(new Callable(this, nameof(SetupUPNP)));
 
         return null;
     }
@@ -302,8 +309,22 @@ public partial class MultiplayerControl : Control
     private void SetupUPNP()
     {
         _upnp = new();
-        _upnp.Discover();
-        _upnp.AddPortMapping(PORT);
+
+        var error = _upnp.Discover();
+
+        if (error != (int)Error.Ok)
+        {
+            GD.PushError("UPNP Error : " + error);
+            EmitSignal(SignalName.UpnpCompleted, error);
+            return;
+        }
+        if (_upnp.GetGateway() != null && _upnp.GetGateway().IsValidGateway())
+        {
+            GD.Print("UPNP : Gateway found");
+            _upnp.AddPortMapping(PORT, PORT, ProjectSettings.GetSetting("application/config/name").ToString(), "TCP");
+            _upnp.AddPortMapping(PORT, PORT, ProjectSettings.GetSetting("application/config/name").ToString(), "UDP");
+            EmitSignal(SignalName.UpnpCompleted);
+        }
         Debug.Print("Success! Join Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT);
         _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT;
     }
@@ -317,6 +338,7 @@ public partial class MultiplayerControl : Control
 
     public override void _ExitTree()
     {
+        _upnpThread.WaitToFinish();
         if (Multiplayer.IsServer())
         {
             Rpc(nameof(ReturnToMenu));
