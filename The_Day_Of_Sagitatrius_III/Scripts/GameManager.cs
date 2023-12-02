@@ -8,11 +8,12 @@ public partial class GameManager : Node
     [Export]
     public Godot.Collections.Dictionary<int, Godot.Collections.Dictionary<string, string>> PlayerIDs = new();
 
+
     public static GameManager Instance { get; private set; }
 
     public enum Team
     {
-        Red,
+        Red = 1,
         Blue,
         Neutral
     }
