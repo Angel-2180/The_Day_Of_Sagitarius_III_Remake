@@ -16,7 +16,10 @@ public partial class MultiplayerControl : Control
     public delegate void ServerDisconnectedEventHandler();
 
     [Signal]
-    public delegate void UpnpCompletedEventHandler(Error error);
+    public delegate void OnUpnpCompletedEventHandler(Error error);
+
+    [Signal]
+    public delegate void OnPlayerCreatedEventHandler();
 
     private const int MAX_CONNECTIONS = 8;
     private const int PORT = 7000;
@@ -92,7 +95,14 @@ public partial class MultiplayerControl : Control
         PlayerDisconnected += OnPlayerDisconnected;
         ServerDisconnected += OnServerDisconnected;
 
-        _upnpThread = new ();
+        OnUpnpCompleted += (err) => 
+        {
+            if (err == (int)Error.Ok)
+            {
+                _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT;  
+            }
+        };
+        _upnpThread = new();
     }
 
     private void OnHostPressed()
@@ -124,6 +134,7 @@ public partial class MultiplayerControl : Control
                 Rpc("AddPlayer", key, value);
             }
         }
+        EmitSignal(SignalName.OnPlayerCreated);
     }
 
     [Rpc(CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -152,7 +163,7 @@ public partial class MultiplayerControl : Control
         _ConnectionsInfos.Visible = true;
         _playerCount.Text = GameManager.Instance.PlayerIDs.Count + " / " + MAX_CONNECTIONS + " players";
 
-        _upnpThread.Start(new Callable(this, nameof(SetupUPNP)));
+        _upnpThread.Start(new Callable(this, MethodName.SetupUPNP));
 
         return null;
     }
@@ -286,6 +297,7 @@ public partial class MultiplayerControl : Control
                 break;
         }
         _world.AddChild(player);
+
     }
 
     private Vector2 GetRandomSpawnPoint(Vector2 origin, Vector2 spawnArea)
@@ -315,7 +327,7 @@ public partial class MultiplayerControl : Control
         if (error != (int)Error.Ok)
         {
             GD.PushError("UPNP Error : " + error);
-            EmitSignal(SignalName.UpnpCompleted, error);
+            EmitSignal(SignalName.OnUpnpCompleted, error);
             return;
         }
         if (_upnp.GetGateway() != null && _upnp.GetGateway().IsValidGateway())
@@ -323,12 +335,11 @@ public partial class MultiplayerControl : Control
             GD.Print("UPNP : Gateway found");
             _upnp.AddPortMapping(PORT, PORT, ProjectSettings.GetSetting("application/config/name").ToString(), "TCP");
             _upnp.AddPortMapping(PORT, PORT, ProjectSettings.GetSetting("application/config/name").ToString(), "UDP");
-            EmitSignal(SignalName.UpnpCompleted);
+            EmitSignal(SignalName.OnUpnpCompleted, (int)Error.Ok);
         }
         Debug.Print("Success! Join Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT);
-        _serverAddress.Text = "Server Address : " + _upnp.GetGateway().QueryExternalAddress() + " : " + PORT;
     }
-
+    
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void ReturnToMenu()
     {
