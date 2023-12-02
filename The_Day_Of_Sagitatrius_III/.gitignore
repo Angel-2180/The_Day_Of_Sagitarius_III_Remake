@@ -36,7 +36,8 @@ mono_crash.*.json
 # Ignore all local history of files
 .history
 .ionide
-
+*.csproj
+*.csproj.old
 .vs/
 
 # End of https://www.toptal.com/developers/gitignore/api/godot,visualstudiocode
