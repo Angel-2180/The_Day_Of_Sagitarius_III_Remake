@@ -7,8 +7,7 @@
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xirw0"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
-properties/0/sync = true
-properties/0/watch = false
+properties/0/replication_mode = 1
 
 [node name="Player" type="Node2D" node_paths=PackedStringArray("camera", "_SplitButton", "_MergeButton", "_canvasLayer")]
 script = ExtResource("1_o3bqr")
