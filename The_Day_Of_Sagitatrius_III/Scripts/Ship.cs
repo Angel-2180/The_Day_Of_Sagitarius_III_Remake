@@ -20,6 +20,9 @@ public partial class Ship : CharacterBody2D
     [Export]
     private Label _shipNumberLabel;
 
+    [Export]
+    private PointLight2D _light;
+
     public Vector2 mousePos = Vector2.Zero;
 
     #region Variables
@@ -63,7 +66,7 @@ public partial class Ship : CharacterBody2D
     [Export]
     private Timer _shootDelay;
 
-    public GameManager.Team team = GameManager.Team.Neutral;
+    public GameManager.Team Team = GameManager.Team.Neutral;
 
     public override void _EnterTree()
     {
@@ -85,6 +88,31 @@ public partial class Ship : CharacterBody2D
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
 
         _shipNumberLabel.Text = FleetSize.ToString();
+
+        // GetTree().NotifyGroup("Ship", 0);
+        
+        AddToGroup("Ship");
+        if (GetParent().IsMultiplayerAuthority())
+        {
+            GetTree().CallGroup("Ship", MethodName.SetLightVisible, (int)Team);
+        }
+
+        // _light.SetVisibilityLayerBit((uint)Team, true);
+        // _light.LightMask = (int)Team;
+        
+    }
+
+    public override void _Notification(int what)
+    {
+        if (what == 0)
+        {
+            GetTree().CallGroup("Ship", MethodName.SetLightVisible, (int)Team);
+        }
+    }
+
+    public void SetLightVisible(int team)
+    {
+        _light.Visible = (GameManager.Team)team == Team;
     }
 
     public void SetSelected(bool selected)
@@ -137,10 +165,13 @@ public partial class Ship : CharacterBody2D
             {
                 TargetPosition = Vector2.Zero;
             }
+            // EmitSignal(Main.SignalName.OnShipMove, GlobalPosition / Main.GRID_SIZE);
         }
         AvoidanceForce = Avoid();
         Velocity = (Velocity + AvoidanceForce * AvoidanceWeight).Normalized() * Speed;
         MoveAndCollide(Velocity * delta);
+        //EmitSignal(Main.SignalName.OnShipMove, GlobalPosition / Main.GRID_SIZE);
+        
     }
 
     public Vector2 Avoid()
@@ -217,7 +248,7 @@ public partial class Ship : CharacterBody2D
 
         var newPlayer = GD.Load<PackedScene>("res://Scenes/ShipBody.tscn").Instantiate() as Ship;
         newPlayer.ID = ID;
-        newPlayer.team = team;
+        newPlayer.Team = Team;
         newPlayer.SetFleetSize(numberOfShipsToRemove);
 
         //random position around the ship
