@@ -64,6 +64,7 @@ text = "Name:"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
+text = "MonkeyBrain"
 
 [node name="AddressContainer" type="HBoxContainer" parent="MainHUD"]
 layout_mode = 2

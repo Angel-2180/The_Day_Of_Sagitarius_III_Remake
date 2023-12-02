@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dv4xc46hrs7m4"]
+[gd_scene load_steps=9 format=3 uid="uid://dv4xc46hrs7m4"]
 
 [ext_resource type="Script" path="res://Scripts/Ship.cs" id="1_ixq1f"]
 [ext_resource type="PackedScene" uid="uid://bpetvjdwtcmpc" path="res://Scenes/Bullet.tscn" id="2_3i8vh"]
 [ext_resource type="Material" uid="uid://ir1v6ppwmrjj" path="res://Shaders/outline_shader.tres" id="3_7ku3q"]
 [ext_resource type="Texture2D" uid="uid://bl87auv455ad" path="res://Arts/player1.png" id="4_bavh3"]
+[ext_resource type="Texture2D" uid="uid://ix7mlc60fpge" path="res://Arts/Circle2.png" id="5_lmmhv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oj6r8"]
 size = Vector2(54, 50)
@@ -29,7 +30,7 @@ properties/3/spawn = true
 properties/3/sync = true
 properties/3/watch = false
 
-[node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipNumberLabel", "_shootDelay")]
+[node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipNumberLabel", "_light", "_shootDelay") groups=["Ship"]]
 collision_layer = 2
 collision_mask = 4
 input_pickable = true
@@ -40,6 +41,7 @@ UiOffsetNode = NodePath("UiOffset")
 Detect = NodePath("Detect")
 sprite = NodePath("Sprite2D")
 _shipNumberLabel = NodePath("NumberOfShips")
+_light = NodePath("PointLight2D")
 _shootDelay = NodePath("ReloadTimer")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -82,3 +84,9 @@ offset_right = 16.0
 offset_bottom = -24.0
 text = "idk 900
 "
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(1, 0)
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 1)
+texture = ExtResource("5_lmmhv")
