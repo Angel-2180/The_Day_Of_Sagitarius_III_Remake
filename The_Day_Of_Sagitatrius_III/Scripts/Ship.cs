@@ -84,37 +84,26 @@ public partial class Ship : CharacterBody2D
         }
 
         _shootDelay.Timeout += () => CanShoot = true;
-
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
-
         _shipNumberLabel.Text = FleetSize.ToString();
 
-        // GetTree().NotifyGroup("Ship", 0);
-        
         AddToGroup("Ship");
-        if (GetParent().IsMultiplayerAuthority())
-        {
-            GetTree().CallGroup("Ship", MethodName.SetLightVisible, (int)Team);
-        }
-
-        // _light.SetVisibilityLayerBit((uint)Team, true);
-        // _light.LightMask = (int)Team;
-        
+        GetTree().NotifyGroup("Player", 0);
     }
-
-    public override void _Notification(int what)
-    {
-        if (what == 0)
-        {
-            GetTree().CallGroup("Ship", MethodName.SetLightVisible, (int)Team);
-        }
-    }
-
+    
     public void SetLightVisible(int team)
     {
-        _light.Visible = (GameManager.Team)team == Team;
+        GD.Print("Team: " + (GameManager.Team)team);
+        if (Team == (GameManager.Team)team)
+        {
+            _light.Visible = true;
+        }
+        else
+        {
+            _light.Visible = false;
+        }
     }
-
+ 
     public void SetSelected(bool selected)
     {
         IsSelected = selected;

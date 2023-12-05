@@ -1,3 +1,4 @@
+using System.Runtime.Serialization.Formatters.Binary;
 using Godot;
 
 public partial class Player : Node2D
@@ -72,10 +73,31 @@ public partial class Player : Node2D
             SetPhysicsProcess(false);
             SetProcessInput(false);
         }
+        else
+        {
+            GetTree().CallGroup("Ship", Ship.MethodName.SetLightVisible, (int)team);
+        }
+        
         if (_SplitButton != null && _MergeButton != null)
         {
             _SplitButton.Pressed += OnSplitButtonPressed;
             _MergeButton.Pressed += OnMergeButtonPressed;
+        }
+    }
+
+    public override void _Notification(int what)
+    {
+        if (what == 0)
+        {
+            if (IsMultiplayerAuthority())
+            {
+                GD.Print("Player: " + PlayerID + " has authority");
+                GetTree().CallGroup("Ship", Ship.MethodName.SetLightVisible, (int)team);
+            }
+            else
+            {
+                GD.Print("Player: " + PlayerID + " does not have authority");
+            }
         }
     }
 

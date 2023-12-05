@@ -9,7 +9,7 @@ properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/replication_mode = 1
 
-[node name="Player" type="Node2D" node_paths=PackedStringArray("camera", "_SplitButton", "_MergeButton", "_canvasLayer")]
+[node name="Player" type="Node2D" node_paths=PackedStringArray("camera", "_SplitButton", "_MergeButton", "_canvasLayer") groups=["Player"]]
 script = ExtResource("1_o3bqr")
 camera = NodePath("Camera2D")
 _SplitButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/SplitButton")

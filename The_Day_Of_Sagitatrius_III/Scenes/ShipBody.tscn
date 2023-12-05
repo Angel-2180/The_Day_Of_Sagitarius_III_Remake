@@ -80,10 +80,11 @@ offset_right = 16.0
 offset_bottom = -24.0
 text = "idk 900
 "
+metadata/_edit_use_anchors_ = true
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
+visible = false
 position = Vector2(1, 0)
 blend_mode = 2
-shadow_enabled = true
 shadow_color = Color(0, 0, 0, 1)
 texture = ExtResource("5_lmmhv")
