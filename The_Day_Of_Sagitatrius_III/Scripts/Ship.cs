@@ -23,6 +23,9 @@ public partial class Ship : CharacterBody2D
     [Export]
     private PointLight2D _light;
 
+    [Export]
+    private Area2D _lightDetectorArea;
+
     public Vector2 mousePos = Vector2.Zero;
 
     #region Variables
@@ -89,6 +92,8 @@ public partial class Ship : CharacterBody2D
 
         AddToGroup("Ship");
         GetTree().NotifyGroup("Player", 0);
+        (sprite.Material as ShaderMaterial).SetShaderParameter("player_pos", GlobalPosition);
+
     }
     
     public void SetLightVisible(int team)
@@ -159,6 +164,8 @@ public partial class Ship : CharacterBody2D
         AvoidanceForce = Avoid();
         Velocity = (Velocity + AvoidanceForce * AvoidanceWeight).Normalized() * Speed;
         MoveAndCollide(Velocity * delta);
+
+        (sprite.Material as ShaderMaterial).SetShaderParameter("player_pos", GlobalPosition);
         //EmitSignal(Main.SignalName.OnShipMove, GlobalPosition / Main.GRID_SIZE);
         
     }
@@ -266,4 +273,62 @@ public partial class Ship : CharacterBody2D
     {
         TargetPosition = destination;
     }
+
+    public void OnAreaEntered(Area2D area)
+    {
+        //disable light when near allies but make sure that there is at least one light still visible 
+        
+
+    }
+
+    /*// In your Ship class
+private List<Ship> _nearbyAllies = new List<Ship>();
+
+public void UpdateNearbyAllies(List<Ship> allShips)
+{
+    _nearbyAllies.Clear();
+    foreach (var ship in allShips)
+    {
+        if (ship.Team == Team && ship != this && (ship.Position - Position).Length() < AllyDetectionRadius)
+        {
+            _nearbyAllies.Add(ship);
+        }
+    }
+    UpdateLight();
+}
+
+private void UpdateLight()
+{
+    if (_nearbyAllies.Count > 0)
+    {
+        // Disable the light if there are any nearby allies
+        _light.Visible = false;
+    }
+    else
+    {
+        // Enable the light if there are no nearby allies
+        _light.Visible = true;
+    }
+}
+
+// In your GameManager class
+public void UpdateAllShips()
+{
+    List<Ship> allShips = GetAllShips();
+    foreach (var ship in allShips)
+    {
+        ship.UpdateNearbyAllies(allShips);
+    }
+    EnsureAtLeastOneLight(allShips);
+}
+
+private void EnsureAtLeastOneLight(List<Ship> allShips)
+{
+    if (!allShips.Any(ship => ship.LightVisible))
+    {
+        // If no lights are visible, enable the light of the ship with the most allies nearby
+        Ship shipWithMostAllies = allShips.OrderByDescending(ship => ship.NearbyAlliesCount).First();
+        shipWithMostAllies.LightVisible = true;
+    }
+}*/
 }

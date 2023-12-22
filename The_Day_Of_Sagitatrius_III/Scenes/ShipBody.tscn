@@ -1,10 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dv4xc46hrs7m4"]
+[gd_scene load_steps=10 format=3 uid="uid://dv4xc46hrs7m4"]
 
 [ext_resource type="Script" path="res://Scripts/Ship.cs" id="1_ixq1f"]
 [ext_resource type="PackedScene" uid="uid://bpetvjdwtcmpc" path="res://Scenes/Bullet.tscn" id="2_3i8vh"]
 [ext_resource type="Material" uid="uid://ir1v6ppwmrjj" path="res://Shaders/outline_shader.tres" id="3_7ku3q"]
 [ext_resource type="Texture2D" uid="uid://bl87auv455ad" path="res://Arts/player1.png" id="4_bavh3"]
-[ext_resource type="Texture2D" uid="uid://ix7mlc60fpge" path="res://Arts/Circle2.png" id="5_lmmhv"]
+[ext_resource type="Texture2D" uid="uid://ix7mlc60fpge" path="res://Arts/Circle2.png" id="5_lrnuc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oj6r8"]
 size = Vector2(54, 50)
@@ -25,6 +25,9 @@ properties/2/replication_mode = 1
 properties/3/path = NodePath("NumberOfShips:position")
 properties/3/spawn = true
 properties/3/replication_mode = 1
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ulolj"]
+radius = 880.254
 
 [node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipNumberLabel", "_light", "_shootDelay") groups=["Ship"]]
 collision_layer = 2
@@ -83,8 +86,18 @@ text = "idk 900
 metadata/_edit_use_anchors_ = true
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
-visible = false
-position = Vector2(1, 0)
+position = Vector2(5.96046e-08, 2.27374e-13)
+rotation = 1.5708
+scale = Vector2(0.1, 0.1)
 blend_mode = 2
-shadow_color = Color(0, 0, 0, 1)
-texture = ExtResource("5_lmmhv")
+texture = ExtResource("5_lrnuc")
+texture_scale = 5.0
+
+[node name="LightDetector" type="Area2D" parent="."]
+position = Vector2(5.96046e-08, 2.27374e-13)
+rotation = 1.5708
+scale = Vector2(0.1, 0.1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LightDetector"]
+scale = Vector2(1, 0.945115)
+shape = SubResource("CircleShape2D_ulolj")
