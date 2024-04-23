@@ -1,19 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://ck5ly0chxduow"]
+[gd_scene load_steps=5 format=3 uid="uid://ck5ly0chxduow"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_clptx"]
+[ext_resource type="Shader" path="res://Shaders/spotlight.gdshader" id="2_tyguv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tpjbr"]
 size = Vector2(50, 50)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_skfyv"]
+shader = ExtResource("2_tyguv")
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_clptx")
 
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-show_behind_parent = true
-color = Color(0, 0, 0, 1)
-
 [node name="SpawnPos" type="Node2D" parent="."]
-scale = Vector2(3, 3)
 
 [node name="Team1Spawn" type="Area2D" parent="SpawnPos" groups=["Spawn_rec"]]
 position = Vector2(26, 214.667)
@@ -63,9 +62,11 @@ grow_vertical = 2
 color = Color(1, 0, 0, 0.290196)
 metadata/_edit_use_anchors_ = true
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="CanvasGroup" type="CanvasGroup" parent="." groups=["LightSource"]]
+material = SubResource("ShaderMaterial_skfyv")
+
+[node name="ColorRect" type="ColorRect" parent="CanvasGroup"]
 show_behind_parent = true
-offset_left = -3445.0
-offset_top = -2504.0
-offset_right = 4859.0
-offset_bottom = 2301.0
+offset_right = 8304.0
+offset_bottom = 4805.0
+color = Color(0, 0, 0, 1)

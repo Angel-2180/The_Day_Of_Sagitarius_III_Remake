@@ -21,10 +21,10 @@ public partial class Ship : CharacterBody2D
     private Label _shipNumberLabel;
 
     [Export]
-    private PointLight2D _light;
+    private RemoteTransform2D _remoteTransform;
 
     [Export]
-    private Area2D _lightDetectorArea;
+    private Texture2D _lightTexture;
 
     public Vector2 mousePos = Vector2.Zero;
 
@@ -79,13 +79,32 @@ public partial class Ship : CharacterBody2D
 
     public override void _Ready()
     {
+        Sprite2D LightSource = new ();
+        LightSource.Texture = _lightTexture;
+        GetTree().GetFirstNodeInGroup("LightSource").AddChild(LightSource);
+        _remoteTransform.RemotePath = LightSource.GetPath();
+
         if (!GetParent().IsMultiplayerAuthority())
         {
             SetProcess(false);
             SetPhysicsProcess(false);
             SetProcessInput(false);
         }
-
+        
+        switch (Team)
+        {
+            case GameManager.Team.Red:
+                if (GetParent().IsMultiplayerAuthority())
+                    GetViewport().CanvasCullMask = 1 | 4;
+                LightSource.VisibilityLayer = 4;
+                break;
+            case GameManager.Team.Blue:
+                if (GetParent().IsMultiplayerAuthority())
+                    GetViewport().CanvasCullMask = 1 | 2;
+                LightSource.VisibilityLayer = 2;
+                break;
+        }
+       
         _shootDelay.Timeout += () => CanShoot = true;
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
         _shipNumberLabel.Text = FleetSize.ToString();
@@ -93,22 +112,11 @@ public partial class Ship : CharacterBody2D
         AddToGroup("Ship");
         GetTree().NotifyGroup("Player", 0);
         (sprite.Material as ShaderMaterial).SetShaderParameter("player_pos", GlobalPosition);
+    }
 
-    }
-    
-    public void SetLightVisible(int team)
-    {
-        GD.Print("Team: " + (GameManager.Team)team);
-        if (Team == (GameManager.Team)team)
-        {
-            _light.Visible = true;
-        }
-        else
-        {
-            _light.Visible = false;
-        }
-    }
- 
+
+
+
     public void SetSelected(bool selected)
     {
         IsSelected = selected;
@@ -265,6 +273,7 @@ public partial class Ship : CharacterBody2D
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void Kill()
     {
+        GetTree().Root.GetNodeOrNull(_remoteTransform.RemotePath)?.QueueFree();
         QueueFree();
     }
 
@@ -274,61 +283,4 @@ public partial class Ship : CharacterBody2D
         TargetPosition = destination;
     }
 
-    public void OnAreaEntered(Area2D area)
-    {
-        //disable light when near allies but make sure that there is at least one light still visible 
-        
-
-    }
-
-    /*// In your Ship class
-private List<Ship> _nearbyAllies = new List<Ship>();
-
-public void UpdateNearbyAllies(List<Ship> allShips)
-{
-    _nearbyAllies.Clear();
-    foreach (var ship in allShips)
-    {
-        if (ship.Team == Team && ship != this && (ship.Position - Position).Length() < AllyDetectionRadius)
-        {
-            _nearbyAllies.Add(ship);
-        }
-    }
-    UpdateLight();
-}
-
-private void UpdateLight()
-{
-    if (_nearbyAllies.Count > 0)
-    {
-        // Disable the light if there are any nearby allies
-        _light.Visible = false;
-    }
-    else
-    {
-        // Enable the light if there are no nearby allies
-        _light.Visible = true;
-    }
-}
-
-// In your GameManager class
-public void UpdateAllShips()
-{
-    List<Ship> allShips = GetAllShips();
-    foreach (var ship in allShips)
-    {
-        ship.UpdateNearbyAllies(allShips);
-    }
-    EnsureAtLeastOneLight(allShips);
-}
-
-private void EnsureAtLeastOneLight(List<Ship> allShips)
-{
-    if (!allShips.Any(ship => ship.LightVisible))
-    {
-        // If no lights are visible, enable the light of the ship with the most allies nearby
-        Ship shipWithMostAllies = allShips.OrderByDescending(ship => ship.NearbyAlliesCount).First();
-        shipWithMostAllies.LightVisible = true;
-    }
-}*/
 }

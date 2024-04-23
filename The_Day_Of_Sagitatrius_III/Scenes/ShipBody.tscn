@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dv4xc46hrs7m4"]
+[gd_scene load_steps=9 format=3 uid="uid://dv4xc46hrs7m4"]
 
 [ext_resource type="Script" path="res://Scripts/Ship.cs" id="1_ixq1f"]
 [ext_resource type="PackedScene" uid="uid://bpetvjdwtcmpc" path="res://Scenes/Bullet.tscn" id="2_3i8vh"]
@@ -26,10 +26,7 @@ properties/3/path = NodePath("NumberOfShips:position")
 properties/3/spawn = true
 properties/3/replication_mode = 1
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_ulolj"]
-radius = 880.254
-
-[node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipNumberLabel", "_light", "_shootDelay") groups=["Ship"]]
+[node name="ShipBody" type="CharacterBody2D" node_paths=PackedStringArray("CanonPosition", "UiOffsetNode", "Detect", "sprite", "_shipNumberLabel", "_remoteTransform", "_shootDelay") groups=["Ship"]]
 collision_layer = 2
 collision_mask = 4
 input_pickable = true
@@ -40,7 +37,8 @@ UiOffsetNode = NodePath("UiOffset")
 Detect = NodePath("Detect")
 sprite = NodePath("Sprite2D")
 _shipNumberLabel = NodePath("NumberOfShips")
-_light = NodePath("PointLight2D")
+_remoteTransform = NodePath("RemoteTransform2D")
+_lightTexture = ExtResource("5_lrnuc")
 _shootDelay = NodePath("ReloadTimer")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -85,19 +83,6 @@ text = "idk 900
 "
 metadata/_edit_use_anchors_ = true
 
-[node name="PointLight2D" type="PointLight2D" parent="."]
-position = Vector2(5.96046e-08, 2.27374e-13)
-rotation = 1.5708
-scale = Vector2(0.1, 0.1)
-blend_mode = 2
-texture = ExtResource("5_lrnuc")
-texture_scale = 5.0
-
-[node name="LightDetector" type="Area2D" parent="."]
-position = Vector2(5.96046e-08, 2.27374e-13)
-rotation = 1.5708
-scale = Vector2(0.1, 0.1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LightDetector"]
-scale = Vector2(1, 0.945115)
-shape = SubResource("CircleShape2D_ulolj")
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="."]
+update_rotation = false
+update_scale = false

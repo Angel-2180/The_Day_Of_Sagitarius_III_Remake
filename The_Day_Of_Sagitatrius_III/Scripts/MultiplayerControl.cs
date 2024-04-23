@@ -282,6 +282,7 @@ public partial class MultiplayerControl : Control
                     var spawnPoint = GetRandomSpawnPoint(origin, origin + _spawnArea);
                     player.GlobalPosition = spawnPoint;
                     player.team = GameManager.Team.Blue;
+                    node.AddChild(player);
                 }
                 break;
 
@@ -293,10 +294,10 @@ public partial class MultiplayerControl : Control
                     var spawnPoint = GetRandomSpawnPoint(origin, origin + _spawnArea);
                     player.GlobalPosition = spawnPoint;
                     player.team = GameManager.Team.Red;
+                    node2.AddChild(player);
                 }
                 break;
         }
-        _world.AddChild(player);
 
     }
 
