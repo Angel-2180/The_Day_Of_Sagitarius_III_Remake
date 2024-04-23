@@ -67,6 +67,8 @@ material = SubResource("ShaderMaterial_skfyv")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasGroup"]
 show_behind_parent = true
+offset_left = -5696.0
+offset_top = -2384.0
 offset_right = 8304.0
 offset_bottom = 4805.0
 color = Color(0, 0, 0, 1)
