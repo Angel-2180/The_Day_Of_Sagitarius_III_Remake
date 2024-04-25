@@ -60,7 +60,7 @@ public partial class Ship : CharacterBody2D
     public bool IsLookAtSelected = false;
 
     [Export]
-    public int ID = 0;
+    public int ID;
 
     public Ship Target = null;
 
@@ -74,17 +74,17 @@ public partial class Ship : CharacterBody2D
     public override void _EnterTree()
     {
         SetMultiplayerAuthority(ID);
-        Name = (ID + GetParent().GetChildCount()).ToString();
     }
 
     public override void _Ready()
     {
+        Name = "Ship " + ID.ToString();
         Sprite2D LightSource = new ();
         LightSource.Texture = _lightTexture;
         GetTree().GetFirstNodeInGroup("LightSource").AddChild(LightSource);
         _remoteTransform.RemotePath = LightSource.GetPath();
 
-        if (!GetParent().IsMultiplayerAuthority())
+        if (!IsMultiplayerAuthority())
         {
             SetProcess(false);
             SetPhysicsProcess(false);
@@ -103,7 +103,14 @@ public partial class Ship : CharacterBody2D
                     GetViewport().CanvasCullMask = 1 | 2;
                 LightSource.VisibilityLayer = 2;
                 break;
+            case GameManager.Team.Neutral:
+                if (GetParent().IsMultiplayerAuthority())
+                    GetViewport().CanvasCullMask = 1 | 8;
+                LightSource.VisibilityLayer = 1;
+                break;
         }
+        GD.Print("CanvasCullMask: " + GetViewport().CanvasCullMask);
+
        
         _shootDelay.Timeout += () => CanShoot = true;
         sprite.Material = sprite.Material.Duplicate() as ShaderMaterial;
@@ -139,6 +146,10 @@ public partial class Ship : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        if (!IsMultiplayerAuthority())
+        {
+            return;
+        }
         _shipNumberLabel.GlobalPosition = GlobalPosition + UiOffset;
         if (IsInstanceValid(Target) && Target.FleetSize > 0)
         {
@@ -250,14 +261,10 @@ public partial class Ship : CharacterBody2D
 
         SetFleetSize(FleetSize - numberOfShipsToRemove);
 
-        var newPlayer = GD.Load<PackedScene>("res://Scenes/ShipBody.tscn").Instantiate() as Ship;
-        newPlayer.ID = ID;
-        newPlayer.Team = Team;
-        newPlayer.SetFleetSize(numberOfShipsToRemove);
+        var data = new Godot.Collections.Array { Position + new Vector2(GD.Randf() * 100 - 50, GD.Randf() * 100 - 50), ID, (int)Team, numberOfShipsToRemove };
 
-        //random position around the ship
-        newPlayer.Position = Position + new Vector2(GD.Randf() * 100 - 50, GD.Randf() * 100 - 50);
-        GetParent().AddChild(newPlayer);
+        ShipSpawner.Instance.Spawn(data);
+       
     }
 
     public void TakeDamage(float damagePower)

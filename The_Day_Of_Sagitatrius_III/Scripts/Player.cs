@@ -49,18 +49,9 @@ public partial class Player : Node2D
 
     private PlayerState _state = PlayerState.Idle;
 
-    [Export]
-    private PackedScene firstShip;
-
     public override void _EnterTree()
     {
-        SetMultiplayerAuthority(PlayerID);
-
-        var newShip = firstShip.Instantiate() as Ship;
-        newShip.ID = PlayerID;
-        newShip.Team = team;
-
-        AddChild(newShip);
+        SetMultiplayerAuthority(PlayerID); 
     }
 
     public override void _Ready()
@@ -103,7 +94,7 @@ public partial class Player : Node2D
                     ship.SetSelected(true);
                     if (_state == PlayerState.AwaitSplitting && _numberOfShips < _maxNumberOfShips)
                     {
-                        ship.Rpc(Ship.MethodName.Split, ship.FleetSize / 2);
+                        ship.RpcId(1, Ship.MethodName.Split, ship.FleetSize / 2);
                         _numberOfShips++;
                         _state = PlayerState.Idle;
                         _color = Colors.Yellow;
@@ -233,7 +224,7 @@ public partial class Player : Node2D
             {
                 if (_numberOfShips >= _maxNumberOfShips) break;
                 ship.SetSelected(false);
-                ship.Rpc(Ship.MethodName.Split, ship.FleetSize / 2);
+                ship.RpcId(1, Ship.MethodName.Split, ship.FleetSize / 2);
                 _numberOfShips++;
             }
             _state = PlayerState.Idle;

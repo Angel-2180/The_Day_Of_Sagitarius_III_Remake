@@ -131,7 +131,7 @@ public partial class MultiplayerControl : Control
 
             foreach (var (key, value) in GameManager.Instance.PlayerIDs)
             {
-                Rpc("AddPlayer", key, value);
+                RpcId(1, MethodName.AddPlayer, key, value);
             }
         }
         EmitSignal(SignalName.OnPlayerCreated);
@@ -262,16 +262,13 @@ public partial class MultiplayerControl : Control
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void AddPlayer(long id, Dictionary<string, string> PlayerInfos)
     {
-        Player player = _character.Instantiate() as Player;
-        player.Name = id.ToString();
-        player.PlayerID = (int)id;
-
-        var spawnNode = _world.FindChild("SpawnCollision") as CollisionShape2D;
-        if (spawnNode != null)
+        var spawnAreaNode = GetTree().GetFirstNodeInGroup("spawn_collision") as CollisionShape2D;
+        if (spawnAreaNode != null)
         {
-            _spawnArea = spawnNode.Shape.GetRect().Size;
+            _spawnArea = spawnAreaNode.Shape.GetRect().Size;
         }
-
+        Vector2 playerSpawnPoint = Vector2.Zero;
+        int playerTeam = 0;
         switch (PlayerInfos["team"])
         {
             case "0":
@@ -280,9 +277,8 @@ public partial class MultiplayerControl : Control
                 {
                     Vector2 origin = node.GlobalPosition;
                     var spawnPoint = GetRandomSpawnPoint(origin, origin + _spawnArea);
-                    player.GlobalPosition = spawnPoint;
-                    player.team = GameManager.Team.Blue;
-                    node.AddChild(player);
+                    playerSpawnPoint = spawnPoint;
+                    playerTeam = (int)GameManager.Team.Blue;
                 }
                 break;
 
@@ -292,12 +288,14 @@ public partial class MultiplayerControl : Control
                 {
                     Vector2 origin = node2.GlobalPosition;
                     var spawnPoint = GetRandomSpawnPoint(origin, origin + _spawnArea);
-                    player.GlobalPosition = spawnPoint;
-                    player.team = GameManager.Team.Red;
-                    node2.AddChild(player);
+                    playerSpawnPoint = spawnPoint;
+                    playerTeam = (int)GameManager.Team.Red;
                 }
                 break;
         }
+        
+        PlayerSpawner.Instance.Spawn(new Godot.Collections.Array { playerSpawnPoint, id, playerTeam });
+        ShipSpawner.Instance.Spawn(new Godot.Collections.Array { playerSpawnPoint, id, playerTeam, 10000 });
 
     }
 
@@ -346,6 +344,12 @@ public partial class MultiplayerControl : Control
     {
         EmitSignal(SignalName.PlayerDisconnected, Multiplayer.GetUniqueId());
         GetTree().ReloadCurrentScene();
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SpawnPlayer()
+    {
+       //
     }
 
     public override void _ExitTree()
