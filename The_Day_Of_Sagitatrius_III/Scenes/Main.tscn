@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://ck5ly0chxduow"]
+[gd_scene load_steps=7 format=3 uid="uid://ck5ly0chxduow"]
 
 [ext_resource type="Script" path="res://Scripts/Main.cs" id="1_clptx"]
 [ext_resource type="Shader" path="res://Shaders/spotlight.gdshader" id="2_tyguv"]
+[ext_resource type="Script" path="res://Scripts/ShipSpawner.cs" id="2_uub6g"]
+[ext_resource type="Script" path="res://Scripts/PlayerSpawner.cs" id="3_plxn2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tpjbr"]
 size = Vector2(50, 50)
@@ -12,13 +14,23 @@ shader = ExtResource("2_tyguv")
 [node name="Main" type="Node2D"]
 script = ExtResource("1_clptx")
 
+[node name="ShipSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Scenes/ShipBody.tscn")
+spawn_path = NodePath(".")
+script = ExtResource("2_uub6g")
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Scenes/Player.tscn")
+spawn_path = NodePath(".")
+script = ExtResource("3_plxn2")
+
 [node name="SpawnPos" type="Node2D" parent="."]
 
 [node name="Team1Spawn" type="Area2D" parent="SpawnPos" groups=["Spawn_rec"]]
 position = Vector2(26, 214.667)
 metadata/_edit_group_ = true
 
-[node name="SpawnCollision" type="CollisionShape2D" parent="SpawnPos/Team1Spawn"]
+[node name="SpawnCollision" type="CollisionShape2D" parent="SpawnPos/Team1Spawn" groups=["spawn_collision"]]
 visible = false
 shape = SubResource("RectangleShape2D_tpjbr")
 
@@ -42,7 +54,7 @@ metadata/_edit_use_anchors_ = true
 position = Vector2(401, 26)
 metadata/_edit_group_ = true
 
-[node name="SpawnCollision" type="CollisionShape2D" parent="SpawnPos/Team2Spawn"]
+[node name="SpawnCollision" type="CollisionShape2D" parent="SpawnPos/Team2Spawn" groups=["spawn_collision"]]
 visible = false
 shape = SubResource("RectangleShape2D_tpjbr")
 

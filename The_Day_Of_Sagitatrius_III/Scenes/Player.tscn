@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://d07l41m26q6qn"]
+[gd_scene load_steps=4 format=3 uid="uid://d07l41m26q6qn"]
 
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_o3bqr"]
 [ext_resource type="Script" path="res://Scripts/PlayerCamera.cs" id="2_lta75"]
-[ext_resource type="PackedScene" uid="uid://dv4xc46hrs7m4" path="res://Scenes/ShipBody.tscn" id="3_sjhgo"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xirw0"]
 properties/0/path = NodePath(".:position")
@@ -15,7 +14,6 @@ camera = NodePath("Camera2D")
 _SplitButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/SplitButton")
 _MergeButton = NodePath("CanvasLayer/Main/HBoxContainer2/HBoxContainer/MergeButton")
 _canvasLayer = NodePath("CanvasLayer")
-firstShip = ExtResource("3_sjhgo")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("2_lta75")
